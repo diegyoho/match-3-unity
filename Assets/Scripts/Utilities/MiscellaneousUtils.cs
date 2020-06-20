@@ -35,6 +35,12 @@ namespace Utilities {
 			}
 		}
 
+		public static bool RectContains(Vector2 position, Vector2 corner, Vector2 size) {
+			Rect rect = new Rect(corner, size);
+
+			return rect.Contains(position);
+		}
+
 		//Retorna o próximo par, caso seja ímpar
 		public static int ToEven(int n) {
 			return n % 2 == 0 ? n : n + 1;

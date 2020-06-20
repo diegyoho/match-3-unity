@@ -33,7 +33,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 		if (Input.touchCount == 1) {
 			Touch touch = Input.GetTouch(0);
 			touchPosition = (Vector2) Camera.main.ScreenToWorldPoint(touch.position);
-			RaycastHit2D raycastHit = Physics2D.Raycast(touchPosition, Vector3.forward, Mathf.Infinity, LayerMask.GetMask("Direction"));
+			RaycastHit2D raycastHit = Physics2D.Raycast(touchPosition, Vector3.forward, Mathf.Infinity);
 			if (elementClicked != null) {
 				switch (touch.phase) {
 					case TouchPhase.Moved:
@@ -84,7 +84,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 
 #endif
 
-	public static void ClearElementClicked(Collider2D other) {
+	public static void ClearElementClicked(ITouchHandler other) {
 		if (instance.elementClicked == other) {
 			ClearElementClicked();
 		}

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utilities;
@@ -15,26 +14,25 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         get { return _type; }
         set {
             _type = value;
-            spr.sprite = GameController.instance.gameData.GetGemSprite(value);
+            spr.sprite = GameController.gameData.GetGemSprite(value);
         }
     }
 
     public Vector2Int position;
     
-    void Start() {
+    void Awake() {
         spr = GetComponent<SpriteRenderer>();
-        type = MiscellaneousUtils.Choose((GemType[]) Enum.GetValues(typeof(GemType)));
     }
 
     public void SetPosition(int x, int y) {
         int sizeBoard = GameController.instance.sizeBoard;
 
-        position.Set(x, y);
+        position = new Vector2Int(x, y);
         transform.position = new Vector2( x - ((sizeBoard/2) - 0.5f), y - ((sizeBoard/2) - 0.5f));
     }
 
     public void TouchDown() {
-        Debug.Log($"{type}, {position}");
+        // Debug.Log($"{type}, {position}");
     }
 
     public void TouchDrag() {
@@ -61,10 +59,21 @@ public class GemBase : MonoBehaviour, ITouchHandler {
                 );
             }
 
-            GameController.instance.SwapGems(
-                position,
-                toPosition
-            );
+            Vector2Int lastPosition = position;
+            Debug.Log($"BSwap{position}");
+            if(GameController.SwapGems(position, toPosition)) {
+                
+            Debug.Log($"ASwap{position}");
+                if(!GameController.HasMatch(position, type) &&
+                   !GameController.HasMatch(lastPosition, GameController.GetGem(lastPosition).type)) {
+                       GameController.SwapGems(position, lastPosition);
+                } else {
+                    List<GemBase> matches = GameController.Match(position, type);
+                    matches.AddRange(GameController.Match(lastPosition, GameController.GetGem(lastPosition).type));
+                    foreach(GemBase g in matches)
+                        g.GetComponent<SpriteRenderer>().color = Color.black;
+                }
+            }
 
             TouchUp();
         }
