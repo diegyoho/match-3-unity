@@ -24,11 +24,18 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         spr = GetComponent<SpriteRenderer>();
     }
 
-    public void SetPosition(int x, int y) {
+    public void SetPosition(Vector2Int position) {
+        this.position = position;
+        GameController.instance.gemBoard[position.x, position.y] = this;
+    }
+
+    public void MoveTo(Vector2Int position) {
         int sizeBoard = GameController.instance.sizeBoard;
 
-        position = new Vector2Int(x, y);
-        transform.position = new Vector2( x - ((sizeBoard/2) - 0.5f), y - ((sizeBoard/2) - 0.5f));
+        transform.position = new Vector2(position.x - ((sizeBoard/2) - 0.5f),
+                                         position.y - ((sizeBoard/2) - 0.5f));
+
+        SetPosition(position);
     }
 
     public void TouchDown() {
@@ -39,40 +46,32 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         if(Vector2.Distance(transform.position, TouchController.touchPosition) > 0.75f) {
 
             Vector2 delta = TouchController.touchPosition - transform.position;
-            Vector2Int toPosition;
+            GemBase otherGem;
 
             if(Mathf.Abs(delta.x) > Mathf.Abs(delta.y)) {
 
-                int newX = (int) (position.x + Mathf.Sign(delta.x));
+                int swapX = (int) (position.x + Mathf.Sign(delta.x));
 
-                toPosition = new Vector2Int(
-                    newX,
-                    position.y
-                );
+                if(swapX < 0 || swapX >= GameController.instance.sizeBoard) {
+                    TouchUp();
+                    return;
+                }
+
+                otherGem = GameController.instance.gemBoard[swapX, position.y];
             } else {
                 
-                int newY = (int) (position.y + Mathf.Sign(delta.y));
+                int swapY = (int) (position.y + Mathf.Sign(delta.y));
 
-                toPosition = new Vector2Int(
-                    position.x,
-                    newY
-                );
+                if(swapY < 0 || swapY >= GameController.instance.sizeBoard) {
+                    TouchUp();
+                    return;
+                }
+
+                otherGem = GameController.instance.gemBoard[position.x, swapY];
             }
 
-            Vector2Int lastPosition = position;
-            Debug.Log($"BSwap{position}");
-            if(GameController.SwapGems(position, toPosition)) {
-                
-            Debug.Log($"ASwap{position}");
-                if(!GameController.HasMatch(position, type) &&
-                   !GameController.HasMatch(lastPosition, GameController.GetGem(lastPosition).type)) {
-                       GameController.SwapGems(position, lastPosition);
-                } else {
-                    List<GemBase> matches = GameController.Match(position, type);
-                    matches.AddRange(GameController.Match(lastPosition, GameController.GetGem(lastPosition).type));
-                    foreach(GemBase g in matches)
-                        g.GetComponent<SpriteRenderer>().color = Color.black;
-                }
+            if(otherGem) {
+                GameController.SwapGems(this, otherGem);
             }
 
             TouchUp();
