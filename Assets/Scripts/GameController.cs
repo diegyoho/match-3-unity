@@ -46,7 +46,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
                         gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
                     }
 
-                StartCoroutine(gem.IEMoveTo(gem.position, fallSpeed));
+                StartCoroutine(gem.IEMoveTo(GetWorldPosition(gem.position), fallSpeed));
             }
         }
     }
@@ -74,8 +74,8 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
     IEnumerator SwapGems(GemBase from, GemBase to) {
 
-        StartCoroutine(from.IEMoveTo(to.position, swapSpeed));
-        StartCoroutine(to.IEMoveTo(from.position, swapSpeed));
+        StartCoroutine(from.IEMoveTo(GetWorldPosition(to.position), swapSpeed));
+        StartCoroutine(to.IEMoveTo(GetWorldPosition(from.position), swapSpeed));
 
         yield return new WaitForSeconds(swapSpeed);
 
@@ -106,7 +106,8 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         } else {
             List<GemBase> matches = new List<GemBase>(matchFrom.matches);
             matches.AddRange(matchTo.matches);
-            DestroyGems(matches);
+            
+            yield return StartCoroutine(DestroyGems(matches));
             yield return StartCoroutine(FallGems(MatchInfo.MergeFallPositions(
                 matchFrom.fallPositions,
                 matchTo.fallPositions
@@ -136,16 +137,15 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
         if(matchInfos.Count > 0) {
             
-            yield return new WaitForSeconds(fallSpeed * 1.5f);
+            // yield return new WaitForSeconds(fallSpeed);
             
             List<Vector3Int> fallPositions = new List<Vector3Int>();
             
-            matchInfos.ForEach(matchInfo => {
-                DestroyGems(matchInfo.matches);
+            foreach(MatchInfo matchInfo in matchInfos) {
+                yield return StartCoroutine(DestroyGems(matchInfo.matches));
                 
                 fallPositions = MatchInfo.MergeFallPositions(fallPositions, matchInfo.fallPositions);
-
-            });
+            }
 
             yield return StartCoroutine(FallGems(fallPositions));
         } else {
@@ -160,7 +160,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         foreach(Vector3Int fall in fallPositions) {
             for(int y = fall.y + fall.z; y < instance.sizeBoardY && instance.gemBoard[fall.x, y]; ++y) {
                 GemBase gem = instance.gemBoard[fall.x, y];
-                StartCoroutine(gem.IEMoveTo(new Vector2Int(fall.x, y - fall.z), fall.z * swapSpeed/1.5f));
+                StartCoroutine(gem.IEMoveTo(
+                    GetWorldPosition(new Vector2Int(fall.x, y - fall.z)),
+                    fall.z * swapSpeed/1.5f
+                ));
                 gem.SetPosition(new Vector2Int(fall.x, y - fall.z));
             }
             for(int i = fall.z; i > 0; --i) {
@@ -170,7 +173,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
                         fall.x, instance.sizeBoardY - i - (instance.sizeBoardY - fall.z)
                     )) + Vector3.up * (Camera.main.orthographicSize + sizeBoardY/2)
                 );
-                StartCoroutine(gem.IEMoveTo(gem.position, fallSpeed));
+                StartCoroutine(gem.IEMoveTo(GetWorldPosition(gem.position), fallSpeed));
             }
         }
         yield return new WaitForSeconds(fallSpeed);
@@ -270,11 +273,20 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         return matchInfo;
     }
 
-    public static void DestroyGems(List<GemBase> matches) {
+    IEnumerator DestroyGems(List<GemBase> matches) {
         foreach(GemBase gem in matches) {
             gem.StopAllCoroutines();
             instance.gemBoard[gem.position.x, gem.position.y] = null;
-            Destroy(gem.gameObject);
+            gem.GetComponent<SpriteRenderer>().sortingOrder = 1;
+            gem.transform.localScale *= 1.2f;
+        }
+        yield return new WaitForSeconds(.1f);
+        foreach(GemBase gem in matches) {
+            StartCoroutine(gem.IEMoveTo(
+                new Vector3(gem.transform.position.x, -(Camera.main.orthographicSize + 1)),
+                .5f
+            ));
+            Destroy(gem.gameObject, 1f);
         }
     }
 }

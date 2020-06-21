@@ -33,8 +33,7 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         transform.position = GameController.GetWorldPosition(position);
     }
 
-    public IEnumerator IEMoveTo(Vector2Int position, float duration) {
-        Vector3 target = GameController.GetWorldPosition(position);
+    public IEnumerator IEMoveTo(Vector3 target, float duration) {
         
         Vector3 direction = target - transform.position;
         float distance = direction.magnitude;
