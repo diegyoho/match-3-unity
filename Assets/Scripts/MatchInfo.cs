@@ -42,20 +42,14 @@ public class MatchInfo {
         }
     }
 
-    public static List<Vector3Int> MergeFallPositions(MatchInfo matchA, MatchInfo matchB) {
+    public static List<Vector3Int> MergeFallPositions(List<Vector3Int> fallA, List<Vector3Int> fallB) {
         
-        if(!matchA.isValid && !matchB.isValid )
+        if(fallA.Count == 0 && fallB.Count == 0)
             return new List<Vector3Int>();
-        else if(!matchA.isValid)
-            return matchB.fallPositions;
-        else if(!matchB.isValid)
-            return matchA.fallPositions;
-
-        List<Vector3Int> fallA = matchA.fallPositions;
-        List<Vector3Int> fallB = matchB.fallPositions;
-        
-        if(fallA.Count == 0)
+        else if(fallA.Count == 0)
             return fallB;
+        else if(fallB.Count == 0)
+            return fallA;
 
         fallB.ForEach(fB => {
             
@@ -93,7 +87,6 @@ public class MatchInfo {
                     }
                 }
             } else {
-                Debug.Log("Aqui!");
                 if(fB.x < fallA[0].x)
                     fallA.Insert(0, fB);
                 else

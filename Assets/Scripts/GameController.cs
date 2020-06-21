@@ -108,12 +108,51 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             matches.AddRange(matchTo.matches);
             DestroyGems(matches);
             yield return StartCoroutine(FallGems(MatchInfo.MergeFallPositions(
-                matchFrom,
-                matchTo
+                matchFrom.fallPositions,
+                matchTo.fallPositions
             )));
+
+            yield return StartCoroutine(FindChainMatches());
         }
         
         TouchController.cancel = false;
+    }
+
+    IEnumerator FindChainMatches() {
+        
+        List<GemBase> gems = MiscellaneousUtils.GetList(gemBoard);
+        List<MatchInfo> matchInfos = new List<MatchInfo>();
+
+        while(gems.Count > 0) {
+            GemBase current = gems[0];
+            gems.Remove(current);
+            
+            MatchInfo matchInfo = GetMatchInfo(current);
+            if(matchInfo.isValid) {
+                matchInfo.matches.ForEach( gem => gems.Remove(gem));
+                matchInfos.Add(matchInfo);
+            }
+        }
+
+        if(matchInfos.Count > 0) {
+            
+            yield return new WaitForSeconds(fallSpeed * 1.5f);
+            
+            List<Vector3Int> fallPositions = new List<Vector3Int>();
+            
+            matchInfos.ForEach(matchInfo => {
+                DestroyGems(matchInfo.matches);
+                
+                fallPositions = MatchInfo.MergeFallPositions(fallPositions, matchInfo.fallPositions);
+
+            });
+
+            yield return StartCoroutine(FallGems(fallPositions));
+        } else {
+            yield break;
+        }
+
+        StartCoroutine(FindChainMatches());
     }
 
     IEnumerator FallGems(List<Vector3Int> fallPositions) {
@@ -134,8 +173,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
                 StartCoroutine(gem.IEMoveTo(gem.position, fallSpeed));
             }
         }
-
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(fallSpeed);
     }
     
     List<GemBase> GetHorizontalMatches(GemBase gem) {

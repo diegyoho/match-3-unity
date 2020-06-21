@@ -5,19 +5,19 @@ using UnityEngine.Events;
 
 namespace Utilities {
 	public static class MiscellaneousUtils {
-		//Cooodernadas Horizontal e Vetical, 0:y, 1:x
+		// Cooodernadas Horizontal e Vetical, 0:y, 1:x
 		public static int[, ] coord4 = new int[, ] { { 0, 1 }, {-1, 0 }, { 0, -1 }, { 1, 0 } };
-		//Cooodernadas Horizontal e Vetical + Diagonais, 0:y, 1:x
+		// Cooodernadas Horizontal e Vetical + Diagonais, 0:y, 1:x
 		public static int[, ] coord8 = new int[, ] { { 0, 1 }, {-1, 1 }, {-1, 0 }, {-1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
 
-		//Preenche um Vetor com um valor definido
+		// Preenche um Vetor com um valor definido
 		public static void Populate<T>(this T[] arr, T value) {
 			for (int i = 0; i < arr.Length; i++) {
 				arr[i] = value;
 			}
 		}
 
-		//Preenche uma Matriz com um valor definido
+		// Preenche uma Matriz com um valor definido
 		public static void Populate<T>(this T[, ] arr, T value) {
 			for (int j = 0; j < arr.GetLength(0); ++j) {
 				for (int i = 0; i < arr.GetLength(1); ++i) {
@@ -26,7 +26,7 @@ namespace Utilities {
 			}
 		}
 
-		//Preenche uma Área da Matriz com um valor definido
+		// Preenche uma Área da Matriz com um valor definido
 		public static void PopulateArea<T>(this T[, ] arr, T value, int x, int y, int xLength, int yLength) {
 			for (int j = y; j < y + yLength; ++j) {
 				for (int i = x; i < x + xLength; ++i) {
@@ -35,22 +35,36 @@ namespace Utilities {
 			}
 		}
 
-		//Retorna o próximo par, caso seja ímpar
+		// Retorna uma Lista de uma Matriz
+		public static List<T> GetList<T>(T[, ] arr) {
+
+			List<T> list = new List<T>();
+
+			for (int i = 0; i < arr.GetLength(0); ++i) {
+				for (int j = 0; j < arr.GetLength(1); ++j) {
+					list.Add(arr[i, j]);
+				}
+			}
+
+			return list;
+		}
+
+		// Retorna o próximo par, caso seja ímpar
 		public static int ToEven(int n) {
 			return n % 2 == 0 ? n : n + 1;
 		}
 
-		//Retorna o próximo ímpar, caso seja par
+		// Retorna o próximo ímpar, caso seja par
 		public static int ToOdd(int n) {
 			return n % 2 == 0 ? n + 1 : n;
 		}
 
-		//Retorna aleatoriamente um dos elementos
+		// Retorna aleatoriamente um dos elementos
 		public static T Choose<T>(T[] chances) {
 			return chances[Random.Range(0, chances.Length)];
 		}
 
-		//StartCoroutine (InvokeRealtimeCoroutine (DoSomething, seconds));
+		// StartCoroutine (InvokeRealtimeCoroutine (DoSomething, seconds));
 		public static IEnumerator InvokeRealtimeCoroutine(UnityAction action, float seconds) {
 			yield return new WaitForSecondsRealtime(seconds);
 			if (action != null)
@@ -91,7 +105,7 @@ namespace Utilities {
 			return Mathf.Lerp(-camera.orthographicSize, camera.orthographicSize, h);
 		}
 
-		//Cria uma textura com uma cor
+		// Cria uma textura com uma cor
 		public static Texture2D MakeTex(int width, int height, Color col) {
 			Color[] pix = new Color[width * height];
 			for (int i = 0; i < pix.Length; ++i) {
