@@ -40,7 +40,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         for(int i = 0; i < sizeBoardX; ++i) {
             for(int j = 0; j < sizeBoardY; ++j) {
                 GemBase gem = CreateGem(i, j);
-                
+
                 if(preventInitialMatches)
                     while(GetMatchInfo(gem).isValid) {
                         gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
@@ -92,6 +92,12 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         TouchController.cancel = true;
         yield return StartCoroutine(SwapGems(from, to));
         
+        if(from.type == to.type) {
+            yield return StartCoroutine(SwapGems(from, to));
+            TouchController.cancel = false;
+            yield break;
+        }
+
         MatchInfo matchFrom = GetMatchInfo(from);
         MatchInfo matchTo = GetMatchInfo(to);
 
@@ -102,8 +108,8 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             matches.AddRange(matchTo.matches);
             DestroyGems(matches);
             yield return StartCoroutine(FallGems(MatchInfo.MergeFallPositions(
-                matchFrom.fallPositions,
-                matchTo.fallPositions
+                matchFrom,
+                matchTo
             )));
         }
         
@@ -113,7 +119,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     IEnumerator FallGems(List<Vector3Int> fallPositions) {
 
         foreach(Vector3Int fall in fallPositions) {
-            for(int y = fall.y + fall.z; y < instance.sizeBoardY; ++y) {
+            for(int y = fall.y + fall.z; y < instance.sizeBoardY && instance.gemBoard[fall.x, y]; ++y) {
                 GemBase gem = instance.gemBoard[fall.x, y];
                 StartCoroutine(gem.IEMoveTo(new Vector2Int(fall.x, y - fall.z), fall.z * swapSpeed/1.5f));
                 gem.SetPosition(new Vector2Int(fall.x, y - fall.z));
@@ -122,7 +128,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
                 GemBase gem = instance.CreateGem(
                     fall.x, instance.sizeBoardY - i,
                     GetWorldPosition(new Vector2Int(
-                        fall.x, instance.sizeBoardY - i - fall.z
+                        fall.x, instance.sizeBoardY - i - (instance.sizeBoardY - fall.z)
                     )) + Vector3.up * (Camera.main.orthographicSize + sizeBoardY/2)
                 );
                 StartCoroutine(gem.IEMoveTo(gem.position, fallSpeed));
@@ -229,6 +235,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     public static void DestroyGems(List<GemBase> matches) {
         foreach(GemBase gem in matches) {
             gem.StopAllCoroutines();
+            instance.gemBoard[gem.position.x, gem.position.y] = null;
             Destroy(gem.gameObject);
         }
     }
