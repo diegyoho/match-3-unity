@@ -71,7 +71,7 @@ public class GemBase : MonoBehaviour, ITouchHandler {
             }
 
             if(otherGem) {
-                GameController.SwapGems(this, otherGem);
+                GameController.TryMatch(this, otherGem);
             }
 
             TouchUp();

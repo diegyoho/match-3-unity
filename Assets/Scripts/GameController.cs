@@ -15,8 +15,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     public float cameraWidth = 7f;
     public int sizeBoard = 6;
     public int minMatch = 3;
+    public bool preventInitialMatches;
     public GemBase[, ] gemBoard;
     public GameObject gemPrefab;
+    public MatchInfo matchInfo;
     public override void Awake() {
         base.Awake();
         MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
@@ -30,9 +32,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             for(int j = 0; j < sizeBoard; ++j) {
                 GemBase gem = CreateGem(i, j);
 
-                // while(Match(gem.position, gem.type).Count > 0) {
-                //     gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
-                // }
+                if(preventInitialMatches)
+                    while(GetMatchInfo(gem).isValid) {
+                        gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
+                    }
             }
         }
     }
@@ -59,39 +62,101 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         from.MoveTo(to.position);
         to.MoveTo(fromPosition);
     }
+
+    public static void TryMatch(GemBase from, GemBase to) {
+        SwapGems(from, to);
+        
+        MatchInfo matchFrom = GetMatchInfo(from);
+        MatchInfo matchTo = GetMatchInfo(to);
+
+        if(!(matchFrom.isValid || matchTo.isValid)) {
+            SwapGems(from, to);
+        }
+    }
     
-    // public static List<GemBase> MatchLine(Vector2Int position, GemType type, Vector2Int direction) {
+    List<GemBase> GetHorizontalMatches(GemBase gem) {
         
-    //     List<GemBase> matches = new List<GemBase>();
+        List<GemBase> matches = new List<GemBase>();
         
-    //     int maxGems = (instance.minMatch * 2) - 1;
+        int id = gem.position.x - 1;
 
-    //     for(int i = 0; i < maxGems; ++i) {
+        while(id >= 0 && gemBoard[id, gem.position.y] && gemBoard[id, gem.position.y].type == gem.type) {
+            matches.Add(gemBoard[id, gem.position.y]);
+            id--;
+        }
+
+        id = gem.position.x + 1;
+
+        while(id < sizeBoard && gemBoard[id, gem.position.y] && gemBoard[id, gem.position.y].type == gem.type) {
+            matches.Add(gemBoard[id, gem.position.y]);
+            id++;
+        }
+
+        return matches;
+    }
+
+    List<GemBase> GetVerticalMatches(GemBase gem) {
+        
+        List<GemBase> matches = new List<GemBase>();
+        
+        int id = gem.position.y - 1;
+
+        while(id >= 0 && gemBoard[gem.position.x, id] && gemBoard[gem.position.x, id].type == gem.type) {
+            matches.Add(gemBoard[gem.position.x, id]);
+            id--;
+        }
+
+        id = gem.position.y + 1;
+
+        while(id < sizeBoard && gemBoard[gem.position.x, id] && gemBoard[gem.position.x, id].type == gem.type) {
+            matches.Add(gemBoard[gem.position.x, id]);
+            id++;
+        }
+
+        return matches;
+    }
+
+    public static MatchInfo GetMatchInfo(GemBase gem) {
+        
+        List<GemBase> matches = new List<GemBase>();
+        
+        List<GemBase> horizontalMatches = instance.GetHorizontalMatches(gem);
+        List<GemBase> verticalMatches = instance.GetVerticalMatches(gem);
+
+        MatchInfo matchInfo = new MatchInfo();
+        
+        if(horizontalMatches.Count + 1 >= instance.minMatch) {
+            matchInfo.type = MatchType.Horizontal;
             
-    //         GemBase current = GetGem(position + direction * (i -(instance.minMatch - 1)));
+            matchInfo.startHorizontalPosition = gem.position;
+            horizontalMatches.ForEach(g => {
+                if(g.position.x < matchInfo.startHorizontalPosition.x)
+                    matchInfo.startHorizontalPosition = g.position;
+            });
+
+            matchInfo.horizontalLenght = horizontalMatches.Count + 1;
+        }
+
+        if(verticalMatches.Count + 1 >= instance.minMatch) {
+            matchInfo.type = matchInfo.type == MatchType.Horizontal ? MatchType.Both : MatchType.Vertical;
             
-    //         if(current && current.type == type) {
-    //             matches.Add(current);        
-    //         } else if(matches.Count < instance.minMatch) {
-    //             matches.Clear();
-                
-    //             if((maxGems - i) < instance.minMatch)
-    //                 break;
-    //         }
-    //     }
+            matchInfo.startVerticalPosition = gem.position;
+            verticalMatches.ForEach(g => {
+                if(g.position.y < matchInfo.startVerticalPosition.y)
+                    matchInfo.startVerticalPosition = g.position;
+            });
 
-    //     return matches;
-    // }
+            matchInfo.verticalLenght = verticalMatches.Count + 1;
+        }
 
-    // public static List<GemBase> Match(Vector2Int position, GemType type) {
-        
-    //     List<GemBase> matches = new List<GemBase>();
-        
-    //     matches.AddRange(MatchLine(position, type, Vector2Int.right));
-    //     matches.AddRange(MatchLine(position, type, Vector2Int.up));
+        if(matchInfo.isValid) {
+            matchInfo.matches.Add(gem);
+            matchInfo.matches.AddRange(horizontalMatches);
+            matchInfo.matches.AddRange(verticalMatches);
+        }
 
-    //     return matches;
-    // }
+        return matchInfo;
+    }
 
     // public static void DestroyGems(List<GemBase> matches) {
     //     foreach(GemBase gem in matches) {
