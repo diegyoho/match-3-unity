@@ -30,10 +30,25 @@ public class GemBase : MonoBehaviour, ITouchHandler {
     }
 
     public void MoveTo(Vector2Int position) {
-        int sizeBoard = GameController.instance.sizeBoard;
+        transform.position = GameController.GetWorldPosition(position);
+    }
 
-        transform.position = new Vector2(position.x - ((sizeBoard/2) - 0.5f),
-                                         position.y - ((sizeBoard/2) - 0.5f));
+    public IEnumerator IEMoveTo(Vector2Int position, float duration) {
+        Vector3 target = GameController.GetWorldPosition(position);
+        
+        Vector3 direction = target - transform.position;
+        float distance = direction.magnitude;
+        direction.Normalize();
+
+        float time = 0;
+
+        while(time < duration) {
+            transform.position += direction * ((Time.deltaTime * distance)/duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = target;
 
     }
 
@@ -51,7 +66,7 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
                 int swapX = (int) (position.x + Mathf.Sign(delta.x));
 
-                if(swapX < 0 || swapX >= GameController.instance.sizeBoard) {
+                if(swapX < 0 || swapX >= GameController.instance.sizeBoardX) {
                     TouchUp();
                     return;
                 }
@@ -61,7 +76,7 @@ public class GemBase : MonoBehaviour, ITouchHandler {
                 
                 int swapY = (int) (position.y + Mathf.Sign(delta.y));
 
-                if(swapY < 0 || swapY >= GameController.instance.sizeBoard) {
+                if(swapY < 0 || swapY >= GameController.instance.sizeBoardY) {
                     TouchUp();
                     return;
                 }
