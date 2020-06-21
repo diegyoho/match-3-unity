@@ -18,7 +18,6 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     public bool preventInitialMatches;
     public GemBase[, ] gemBoard;
     public GameObject gemPrefab;
-    public MatchInfo matchInfo;
     public override void Awake() {
         base.Awake();
         MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
@@ -32,7 +31,6 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             for(int j = 0; j < sizeBoard; ++j) {
                 GemBase gem = CreateGem(i, j);
                 
-                gem.MoveTo(gem.position);
                 if(preventInitialMatches)
                     while(GetMatchInfo(gem).isValid) {
                         gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
@@ -51,6 +49,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         ).GetComponent<GemBase>();
 
         gem.SetPosition(new Vector2Int(x, y));
+        gem.MoveTo(gem.position);
         gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
 
         return gem;
@@ -78,6 +77,25 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             List<GemBase> matches = new List<GemBase>(matchFrom.matches);
             matches.AddRange(matchTo.matches);
             DestroyGems(matches);
+            FallGems(matchFrom);
+            FallGems(matchTo);
+        }
+    }
+
+    public static void FallGems(MatchInfo matchInfo) {
+        if(!matchInfo.isValid)
+            return;
+
+        Vector2Int startPosition = matchInfo.type == MatchType.Vertical ?
+                                   matchInfo.startVerticalPosition : matchInfo.startHorizontalPosition;
+
+        for(int i = startPosition.x; i < startPosition.x + matchInfo.horizontalLenght; ++i) {
+            for(int j = startPosition.y + 1; j < instance.sizeBoard; ++j) {
+                GemBase gem = instance.gemBoard[i, j];
+                gem.MoveTo(new Vector2Int(i, j - 1));
+                gem.SetPosition(new Vector2Int(i, j - 1));
+            }
+            instance.CreateGem(i, 5);
         }
     }
     
@@ -142,6 +160,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             });
 
             matchInfo.horizontalLenght = horizontalMatches.Count + 1;
+            matchInfo.verticalLenght = 1;
         }
 
         if(verticalMatches.Count + 1 >= instance.minMatch) {
@@ -154,6 +173,9 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             });
 
             matchInfo.verticalLenght = verticalMatches.Count + 1;
+            
+            if(matchInfo.type == MatchType.Vertical)
+                matchInfo.horizontalLenght = 1;
         }
 
         if(matchInfo.isValid) {
@@ -170,13 +192,4 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             Destroy(gem.gameObject);
         }
     }
-
-    // public static void GemFall(Vector2Int position) {
-    //     GemBase gem = GetGem(position);
-    //     if(gem) {
-    //         instance.gemBoard[gem.position.x, gem.position.y] = null;
-    //         gem.SetPosition(position + Vector2Int.down);
-    //         GemFall(position + Vector2Int.up);
-    //     }
-    // }
 }
