@@ -77,26 +77,23 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             List<GemBase> matches = new List<GemBase>(matchFrom.matches);
             matches.AddRange(matchTo.matches);
             DestroyGems(matches);
-            FallGems(matchFrom);
-            FallGems(matchTo);
+            FallGems(MatchInfo.MergeFallPositions(matchFrom.fallPositions, matchTo.fallPositions));
         }
     }
 
-    public static void FallGems(MatchInfo matchInfo) {
-        if(!matchInfo.isValid)
-            return;
+    public static void FallGems(List<Vector3Int> fallPositions) {
 
-        Vector2Int startPosition = matchInfo.type == MatchType.Vertical ?
-                                   matchInfo.startVerticalPosition : matchInfo.startHorizontalPosition;
-
-        for(int i = startPosition.x; i < startPosition.x + matchInfo.horizontalLenght; ++i) {
-            for(int j = startPosition.y + 1; j < instance.sizeBoard; ++j) {
-                GemBase gem = instance.gemBoard[i, j];
-                gem.MoveTo(new Vector2Int(i, j - 1));
-                gem.SetPosition(new Vector2Int(i, j - 1));
+        fallPositions.ForEach(fall => {
+            Debug.Log(fall);
+            for(int y = fall.y + fall.z; y < instance.sizeBoard; ++y) {
+                GemBase gem = instance.gemBoard[fall.x, y];
+                gem.MoveTo(new Vector2Int(fall.x, y - fall.z));
+                gem.SetPosition(new Vector2Int(fall.x, y - fall.z));
             }
-            instance.CreateGem(i, 5);
-        }
+            for(int i = fall.z; i > 0; --i) {
+                instance.CreateGem(fall.x, instance.sizeBoard - i);
+            }
+        });
     }
     
     List<GemBase> GetHorizontalMatches(GemBase gem) {
@@ -160,6 +157,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             });
 
             matchInfo.horizontalLenght = horizontalMatches.Count + 1;
+            matchInfo.startVerticalPosition = matchInfo.startHorizontalPosition;
             matchInfo.verticalLenght = 1;
         }
 
@@ -174,14 +172,17 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
             matchInfo.verticalLenght = verticalMatches.Count + 1;
             
-            if(matchInfo.type == MatchType.Vertical)
+            if(matchInfo.type == MatchType.Vertical) {
+                matchInfo.startHorizontalPosition = matchInfo.startVerticalPosition;
                 matchInfo.horizontalLenght = 1;
+            }
         }
 
         if(matchInfo.isValid) {
             matchInfo.matches.Add(gem);
             matchInfo.matches.AddRange(horizontalMatches);
             matchInfo.matches.AddRange(verticalMatches);
+            matchInfo.CalcFallPositions();
         }
 
         return matchInfo;

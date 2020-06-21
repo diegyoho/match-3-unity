@@ -9,7 +9,6 @@ public enum MatchType {
     Both
 }
 
-[System.Serializable]
 public class MatchInfo {
 
     public MatchType type;
@@ -20,9 +19,44 @@ public class MatchInfo {
 
     public List<GemBase> matches = new List<GemBase>();
 
+    // Posição (x, y), Altura (z)
+    public List<Vector3Int> fallPositions = new List<Vector3Int>();
+
     public Vector2Int startHorizontalPosition;
     public Vector2Int startVerticalPosition;
 
     public int horizontalLenght;
     public int verticalLenght;
+
+    public void CalcFallPositions() {
+
+        for(int x = startHorizontalPosition.x; x < startHorizontalPosition.x + horizontalLenght; ++x) {
+            
+            bool isVertical = type != MatchType.Horizontal && x == startVerticalPosition.x;
+
+            int y = isVertical ? startVerticalPosition.y : startHorizontalPosition.y;
+
+            int height = isVertical ? verticalLenght : 1;
+
+            fallPositions.Add(new Vector3Int(x, y, height));
+        }
+    }
+
+    public static List<Vector3Int> MergeFallPositions(List<Vector3Int> fallA, List<Vector3Int> fallB) {
+        
+        fallB.ForEach(fB => {
+            int id = fallA.FindIndex(fA => fA.x == fB.x);
+            if(id >= 0) {
+                fallA[id] = new Vector3Int(
+                    fallA[id].x,
+                    (int) Mathf.Min(fallA[id].y, fB.y),
+                    fallA[id].z + 1
+                );
+            } else {
+                fallA.Add(fB);
+            }
+        });
+        
+        return fallA;
+    }
 }
