@@ -31,7 +31,8 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         for(int i = 0; i < sizeBoard; ++i) {
             for(int j = 0; j < sizeBoard; ++j) {
                 GemBase gem = CreateGem(i, j);
-
+                
+                gem.MoveTo(gem.position);
                 if(preventInitialMatches)
                     while(GetMatchInfo(gem).isValid) {
                         gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
@@ -49,8 +50,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             transform
         ).GetComponent<GemBase>();
 
-        
-        gem.MoveTo(new Vector2Int(x, y));
+        gem.SetPosition(new Vector2Int(x, y));
         gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
 
         return gem;
@@ -58,9 +58,12 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
     public static void SwapGems(GemBase from, GemBase to) {
 
-        Vector2Int fromPosition = from.position;
         from.MoveTo(to.position);
-        to.MoveTo(fromPosition);
+        to.MoveTo(from.position);
+
+        Vector2Int fromPosition = from.position;
+        from.SetPosition(to.position);
+        to.SetPosition(fromPosition);
     }
 
     public static void TryMatch(GemBase from, GemBase to) {
@@ -71,6 +74,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
         if(!(matchFrom.isValid || matchTo.isValid)) {
             SwapGems(from, to);
+        } else {
+            List<GemBase> matches = new List<GemBase>(matchFrom.matches);
+            matches.AddRange(matchTo.matches);
+            DestroyGems(matches);
         }
     }
     
@@ -158,12 +165,11 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         return matchInfo;
     }
 
-    // public static void DestroyGems(List<GemBase> matches) {
-    //     foreach(GemBase gem in matches) {
-    //         instance.gemBoard[gem.position.x, gem.position.y] = null;
-    //         Destroy(gem.gameObject);
-    //     }
-    // }
+    public static void DestroyGems(List<GemBase> matches) {
+        foreach(GemBase gem in matches) {
+            Destroy(gem.gameObject);
+        }
+    }
 
     // public static void GemFall(Vector2Int position) {
     //     GemBase gem = GetGem(position);

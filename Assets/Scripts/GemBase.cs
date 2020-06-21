@@ -35,7 +35,6 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         transform.position = new Vector2(position.x - ((sizeBoard/2) - 0.5f),
                                          position.y - ((sizeBoard/2) - 0.5f));
 
-        SetPosition(position);
     }
 
     public void TouchDown() {
