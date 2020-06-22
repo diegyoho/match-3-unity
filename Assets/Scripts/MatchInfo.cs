@@ -90,23 +90,24 @@ public class MatchInfo {
         }
     }
 
-    // Join Matches from same type
-    public static MatchInfo JoinMatches(MatchInfo a, MatchInfo b) {
+    // Join Crossed Matches from same type
+    public static MatchInfo JoinCrossedMatches(MatchInfo a, MatchInfo b) {
 
         if(!(a.isValid && b.isValid) || a.pivot.type != a.pivot.type) {
             return new MatchInfo();
         }
 
-        a._matches.ForEach(match => {
+        foreach(GemBase match in a._matches) {
             if(b._matches.Contains(match)) {
                 a._pivot = match.position;
                 b._matches.Remove(match);
+                a.AddMatches(b._matches);
+
+                return a;
             }
-        });
+        }
 
-        a.AddMatches(b._matches);
-
-        return a;
+        return new MatchInfo();
     }
 
     // Position(x, y) and Height(z)

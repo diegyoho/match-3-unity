@@ -127,7 +127,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             yield return StartCoroutine(DestroyGems(matches));
             yield return StartCoroutine(FallGems(fallPositions));
 
-            // yield return StartCoroutine(UpdateBoard());
+            yield return StartCoroutine(UpdateBoard());
         }
         
         TouchController.cancel = false;
@@ -148,7 +148,11 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             MatchInfo matchInfo = GetCrossMatch(current);
             if(matchInfo.isValid) {
                 matchInfo.matches.ForEach( gem => gems.Remove(gem));
-                matchInfos.Add(matchInfo);
+                MatchInfo matchInfoSameType = matchInfos.Find(mi => mi.pivot.type == matchInfo.pivot.type);
+                if(matchInfoSameType != null)
+                    matchInfoSameType = MatchInfo.JoinCrossedMatches(matchInfoSameType, matchInfo);
+                else
+                    matchInfos.Add(matchInfo);
             }
         }
 
@@ -158,7 +162,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             List<GemBase> matchesToDestroy = new List<GemBase>();
             foreach(MatchInfo matchInfo in matchInfos) {
                 matchesToDestroy.AddRange(matchInfo.matches);
-                // fallPositions = MatchInfo.MergeFallPositions(fallPositions, matchInfo.fallPositions);
+                fallPositions.AddRange(matchInfo.GetFallPositions());
             }
 
             yield return StartCoroutine(DestroyGems(matchesToDestroy));
@@ -167,7 +171,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             yield break;
         }
 
-        StartCoroutine(FindChainMatches());
+        yield return StartCoroutine(FindChainMatches());
     }
 
     IEnumerator FallGems(List<Vector3Int> fallPositions) {
@@ -279,7 +283,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             crossCheck++;
         }
 
-        MatchInfo cross = MatchInfo.JoinMatches(horizontal, vertical);
+        MatchInfo cross = MatchInfo.JoinCrossedMatches(horizontal, vertical);
 
         if(!cross.isValid)
             if(horizontal.isValid) return horizontal;
@@ -300,7 +304,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                 ));
             }
         }
-        yield return new WaitForSeconds(GameController.instance.fallSpeed * 2);
+        yield return new WaitForSeconds(GameController.instance.fallSpeed);
+        StartCoroutine(FindChainMatches());
     }
 
     void FindHints() {

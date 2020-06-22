@@ -61,7 +61,11 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         yield return new WaitForSeconds(GameController.instance.swapSpeed);
 
         StartCoroutine(MoveTo(
-            new Vector3(0, -(Camera.main.orthographicSize + 1f)),
+            new Vector3(
+                transform.position.x,
+                transform.position.y - (Camera.main.orthographicSize + 1f +
+                ((BoardController.height/2) - 0.5f))
+            ),
             GameController.instance.fallSpeed
         ));
         Destroy(gameObject, GameController.instance.fallSpeed);
