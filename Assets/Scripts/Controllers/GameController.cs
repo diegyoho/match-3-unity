@@ -19,6 +19,9 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     public override void Awake() {
         base.Awake();
         MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
+    }
+
+    void Start() {
         BoardController.CreateBoard();
     }
 

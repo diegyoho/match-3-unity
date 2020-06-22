@@ -2,14 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Flags]
 public enum MatchType {
     Invalid,
     Horizontal,
     Vertical,
-    Both
+    Cross
 }
 
 public class MatchInfo {
+    Vector2Int minPosition;
+    Vector2Int maxPosition;
+
+    int horizontalLenght {
+        get { return (maxPosition.x - minPosition.x) + 1; }
+    }
+
+    int verticalLenght {
+        get { return (maxPosition.y - minPosition.y) + 1; }
+    }
 
     public MatchType type;
 
@@ -17,83 +28,92 @@ public class MatchInfo {
         get { return type != MatchType.Invalid; }
     }
 
-    public List<GemBase> matches = new List<GemBase>();
+    List<GemBase> _matches = new List<GemBase>();
+    public List<GemBase> matches {
+        get { return _matches; }
+    }
 
-    // Posição (x, y), Altura (z)
-    public List<Vector3Int> fallPositions = new List<Vector3Int>();
-
-    public Vector2Int startHorizontalPosition;
-    public Vector2Int startVerticalPosition;
-
-    public int horizontalLenght;
-    public int verticalLenght;
-
-    public void CalcFallPositions() {
-
-        for(int x = startHorizontalPosition.x; x < startHorizontalPosition.x + horizontalLenght; ++x) {
-            
-            bool isVertical = type != MatchType.Horizontal && x == startVerticalPosition.x;
-
-            int y = isVertical ? startVerticalPosition.y : startHorizontalPosition.y;
-
-            int height = isVertical ? verticalLenght : 1;
-
-            fallPositions.Add(new Vector3Int(x, y, height));
+    Vector2Int _pivot;
+    public GemBase pivot {
+        get {
+            if(type == MatchType.Cross)
+                return matches.Find(gem => gem.position == _pivot);
+            else
+                return matches[0];
         }
     }
 
-    public static List<Vector3Int> MergeFallPositions(List<Vector3Int> fallA, List<Vector3Int> fallB) {
-        
-        if(fallA.Count == 0 && fallB.Count == 0)
-            return new List<Vector3Int>();
-        else if(fallA.Count == 0)
-            return fallB;
-        else if(fallB.Count == 0)
-            return fallA;
+    public MatchInfo(List<GemBase> matches = null) {
+        if(matches != null)
+            AddMatches(matches);
+    }
 
-        fallB.ForEach(fB => {
+    public bool TypeIs(MatchType type) {
+        return (this.type & type) != MatchType.Invalid;
+    }
+
+    void AddMatches(List<GemBase> matches) {
+        _matches.AddRange(matches);
+        CalcBoundaries();
+    }
+
+    void CalcBoundaries() {
+        type = MatchType.Invalid;
+        minPosition = maxPosition = pivot.position;
+
+        foreach(GemBase match in matches) {
+            int x = minPosition.x;
+            int y = minPosition.y;
+
+            if(match.position.x < minPosition.x)
+                x = match.position.x;
+            if(match.position.y < minPosition.y)
+                y = match.position.y;
             
-            int id = fallA.FindIndex(fA => fA.x == fB.x);
+            minPosition = new Vector2Int(x, y);
 
-            if(id >= 0) {
-                int diffY = fB.y - fallA[id].y;
-                
-                if(Mathf.Abs(diffY) == 1) {
-                    fallA[id] = new Vector3Int(
-                        fallA[id].x,
-                        (int) Mathf.Min(fallA[id].y, fB.y),
-                        fallA[id].z + fB.z
-                    );
-                } else {
-                    if(diffY > 0) {
+            x = maxPosition.x;
+            y = maxPosition.y;
+            
+            if(match.position.x > maxPosition.x)
+                x = match.position.x;
+            if(match.position.y > maxPosition.y)
+                y = match.position.y;
+            
+            maxPosition = new Vector2Int(x, y);
+            
+            if(!TypeIs(MatchType.Horizontal) && horizontalLenght >= BoardController.instance.minMatch) {
+                type |= MatchType.Horizontal;
+            }
 
-                        fB = new Vector3Int(
-                            fB.x,
-                            fB.y - fallA[id].z,
-                            fB.z + fallA[id].z
-                        );
+            if(!TypeIs(MatchType.Vertical) && verticalLenght >= BoardController.instance.minMatch)
+                type |= MatchType.Vertical;
+        }
+    }
 
-                        fallA.Add(fB);
+    public static MatchInfo JoinMatches(MatchInfo a, MatchInfo b) {
 
-                    } else {
+        if(!(a.isValid && b.isValid) || a.pivot.type != a.pivot.type) {
+            return new MatchInfo();
+        }
 
-                        fallA.Insert(0, fB);
-
-                        fallA[id] = new Vector3Int(
-                            fallA[id].x,
-                            fallA[id].y - fB.z,
-                            fallA[id].z + fB.z
-                        );
-                    }
-                }
-            } else {
-                if(fB.x < fallA[0].x)
-                    fallA.Insert(0, fB);
-                else
-                    fallA.Add(fB);
+        a.matches.ForEach(match => {
+            if(b.matches.Contains(match)) {
+                a._pivot = match.position;
+                b.matches.Remove(match);
             }
         });
-        
-        return fallA;
+
+        a.AddMatches(b.matches);
+
+        return a;
+    }
+
+    public List<Vector3Int> GetFallPositions() {
+        List<Vector3Int> fallPositions = new List<Vector3Int>();
+
+
+
+        return fallPositions;
     }
 }
