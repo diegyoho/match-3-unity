@@ -144,6 +144,21 @@ namespace Utilities {
 			return new List<T>(array);
 		}
 
+		public static T[, ] ShuffleMatrix<T>(T[, ] arr) {
+			int m = arr.GetLength(0);
+			int n = arr.GetLength(1);
+
+			for (int i = m * n - 1; i > 0; --i) {
+				int j = Random.Range(0, i + 1);
+
+				T temp = arr[i / n, i % n];
+				arr[i / n, i % n] = arr[j / n, j % n];
+				arr[j / n, j % n] = temp;
+			}
+
+			return arr;
+		}
+
 		public static int Mod(int x, int m) {
 			return (x % m + m) % m;
 		}

@@ -96,10 +96,14 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                 matchTo.fallPositions
             )));
 
-            yield return StartCoroutine(FindChainMatches());
+            yield return StartCoroutine(UpdateBoard());
         }
         
         TouchController.cancel = false;
+    }
+
+    IEnumerator UpdateBoard() {
+        yield return StartCoroutine(FindChainMatches());
     }
 
     IEnumerator FindChainMatches() {
@@ -267,6 +271,21 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         }
 
         return matchInfo;
+    }
+
+    public IEnumerator ShuffleBoard() {
+        gemBoard = MiscellaneousUtils.ShuffleMatrix(gemBoard);
+
+        for(int i = 0; i < instance.sizeBoardX; ++i) {
+            for(int j = 0; j < instance.sizeBoardY; ++j) {
+                gemBoard[i, j].SetPosition(new Vector2Int(i, j));
+                StartCoroutine(gemBoard[i, j].MoveTo(
+                    GetWorldPosition(gemBoard[i, j].position),
+                    GameController.instance.fallSpeed
+                ));
+            }
+        }
+        yield return new WaitForSeconds(GameController.instance.fallSpeed * 2);
     }
 
     IEnumerator DestroyGems(List<GemBase> matches) {

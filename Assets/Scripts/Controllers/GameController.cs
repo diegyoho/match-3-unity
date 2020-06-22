@@ -21,4 +21,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
         BoardController.CreateBoard();
     }
+
+    void Update() {
+        if(Input.GetKeyDown(KeyCode.Space)) {
+            StartCoroutine(BoardController.instance.ShuffleBoard());
+        }
+    }
 }
