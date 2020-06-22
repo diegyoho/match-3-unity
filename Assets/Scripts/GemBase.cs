@@ -6,7 +6,8 @@ using Utilities;
 [RequireComponent(typeof(SpriteRenderer))]
 public class GemBase : MonoBehaviour, ITouchHandler {
     
-    SpriteRenderer spr;
+    [HideInInspector]
+    public SpriteRenderer spr;
 
     public GemType type;
     public Vector2Int position;
@@ -43,6 +44,27 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
         transform.position = target;
 
+    }
+
+    public void Matched() {
+        StartCoroutine(IEMatched());
+    }
+
+    IEnumerator IEMatched() {
+        
+        spr.sortingOrder = 1;
+        Color c = spr.color;
+        c.a = 0.5f;
+        spr.color = c;
+        transform.localScale = Vector3.one * 1.2f;
+
+        yield return new WaitForSeconds(GameController.instance.swapSpeed);
+
+        StartCoroutine(MoveTo(
+            new Vector3(0, -(Camera.main.orthographicSize + 1f)),
+            GameController.instance.fallSpeed
+        ));
+        Destroy(gameObject, GameController.instance.fallSpeed);
     }
 
     public void TouchDown() {

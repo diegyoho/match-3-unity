@@ -90,6 +90,7 @@ public class MatchInfo {
         }
     }
 
+    // Join Matches from same type
     public static MatchInfo JoinMatches(MatchInfo a, MatchInfo b) {
 
         if(!(a.isValid && b.isValid) || a.pivot.type != a.pivot.type) {

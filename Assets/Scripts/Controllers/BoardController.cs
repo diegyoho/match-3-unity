@@ -310,19 +310,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         foreach(GemBase gem in matches) {
             gem.StopAllCoroutines();
             gemBoard[gem.position.x, gem.position.y] = null;
-            gem.GetComponent<SpriteRenderer>().sortingOrder = 1;
-            gem.transform.localScale *= 1.2f;
+            gem.Matched();
         }
         yield return new WaitForSeconds(GameController.instance.swapSpeed);
-        // foreach(GemBase gem in matches) {
-        //     gem.StartCoroutine(gem.MoveTo(
-        //         new Vector3(
-        //             gem.transform.position.x,
-        //             -(Camera.main.orthographicSize + .5f) + gem.transform.position.y - sizeBoardY/2
-        //         ),
-        //         GameController.instance.fallSpeed
-        //     ));
-        //     Destroy(gem.gameObject, GameController.instance.fallSpeed);
-        // }
     }
 }
