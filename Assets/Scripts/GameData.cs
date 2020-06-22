@@ -17,13 +17,14 @@ public enum GemType {
 public class GemData {
     public GemType type;
     public Sprite sprite;
+    public int minMatch = 3;
 }
 
 [CreateAssetMenu(fileName = "GameData", menuName = "Match3/GameData", order = 1)]
 public class GameData : ScriptableObject {
     public List<GemData> gems = new List<GemData>();
 
-    public Sprite GetGemSprite(GemType gemType) {
-        return gems.Find(gem => gem.type == gemType).sprite;
+    public GemData RandomGem() {
+        return MiscellaneousUtils.Choose(gems);
     }
 }

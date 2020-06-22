@@ -30,16 +30,16 @@ public class MatchInfo {
 
     List<GemBase> _matches = new List<GemBase>();
     public List<GemBase> matches {
-        get { return _matches; }
+        get { return new List<GemBase>(_matches); }
     }
 
     Vector2Int _pivot;
     public GemBase pivot {
         get {
             if(type == MatchType.Cross)
-                return matches.Find(gem => gem.position == _pivot);
+                return _matches.Find(gem => gem.position == _pivot);
             else
-                return matches[0];
+                return _matches[0];
         }
     }
 
@@ -54,14 +54,14 @@ public class MatchInfo {
 
     void AddMatches(List<GemBase> matches) {
         _matches.AddRange(matches);
-        CalcBoundaries();
+        ValidateMatch();
     }
 
-    void CalcBoundaries() {
+    void ValidateMatch() {
         type = MatchType.Invalid;
         minPosition = maxPosition = pivot.position;
 
-        foreach(GemBase match in matches) {
+        foreach(GemBase match in _matches) {
             int x = minPosition.x;
             int y = minPosition.y;
 
@@ -82,11 +82,10 @@ public class MatchInfo {
             
             maxPosition = new Vector2Int(x, y);
             
-            if(!TypeIs(MatchType.Horizontal) && horizontalLenght >= BoardController.instance.minMatch) {
+            if(horizontalLenght >= pivot.minMatch)
                 type |= MatchType.Horizontal;
-            }
 
-            if(!TypeIs(MatchType.Vertical) && verticalLenght >= BoardController.instance.minMatch)
+            if(verticalLenght >= pivot.minMatch)
                 type |= MatchType.Vertical;
         }
     }
@@ -97,22 +96,34 @@ public class MatchInfo {
             return new MatchInfo();
         }
 
-        a.matches.ForEach(match => {
-            if(b.matches.Contains(match)) {
+        a._matches.ForEach(match => {
+            if(b._matches.Contains(match)) {
                 a._pivot = match.position;
-                b.matches.Remove(match);
+                b._matches.Remove(match);
             }
         });
 
-        a.AddMatches(b.matches);
+        a.AddMatches(b._matches);
 
         return a;
     }
 
+    // Position(x, y) and Height(z)
     public List<Vector3Int> GetFallPositions() {
         List<Vector3Int> fallPositions = new List<Vector3Int>();
 
-
+        _matches.ForEach(match => {
+            int id = fallPositions.FindIndex(f => f.x == match.position.x);
+            if(id > -1) {
+                fallPositions[id] += new Vector3Int(0, 0, 1);
+            } else {
+                fallPositions.Add(new Vector3Int(
+                    match.position.x,
+                    match.position.y,
+                    1
+                ));
+            }
+        });
 
         return fallPositions;
     }

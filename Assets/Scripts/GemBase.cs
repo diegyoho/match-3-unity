@@ -7,26 +7,24 @@ using Utilities;
 public class GemBase : MonoBehaviour, ITouchHandler {
     
     SpriteRenderer spr;
-    
-    [SerializeField]
-    GemType _type;
-    public GemType type {
-        get { return _type; }
-        set {
-            _type = value;
-            spr.sprite = GameController.gameData.GetGemSprite(value);
-        }
-    }
 
+    public GemType type;
     public Vector2Int position;
+    public int minMatch = 3;
     
     void Awake() {
         spr = GetComponent<SpriteRenderer>();
     }
 
+    public void SetType(GemData gemData) {
+        type = gemData.type;
+        spr.sprite = gemData.sprite;
+        minMatch = gemData.minMatch;
+    }
+
     public void SetPosition(Vector2Int position) {
         this.position = position;
-        BoardController.instance.gemBoard[position.x, position.y] = this;
+        BoardController.gemBoard[position.x, position.y] = this;
     }
 
     public IEnumerator MoveTo(Vector3 target, float duration) {
@@ -61,22 +59,22 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
                 int swapX = (int) (position.x + Mathf.Sign(delta.x));
 
-                if(swapX < 0 || swapX >= BoardController.instance.sizeBoardX) {
+                if(swapX < 0 || swapX >= BoardController.width) {
                     TouchUp();
                     return;
                 }
 
-                otherGem = BoardController.instance.gemBoard[swapX, position.y];
+                otherGem = BoardController.gemBoard[swapX, position.y];
             } else {
                 
                 int swapY = (int) (position.y + Mathf.Sign(delta.y));
 
-                if(swapY < 0 || swapY >= BoardController.instance.sizeBoardY) {
+                if(swapY < 0 || swapY >= BoardController.height) {
                     TouchUp();
                     return;
                 }
 
-                otherGem = BoardController.instance.gemBoard[position.x, swapY];
+                otherGem = BoardController.gemBoard[position.x, swapY];
             }
 
             if(otherGem) {
