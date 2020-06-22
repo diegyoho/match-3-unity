@@ -3,28 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utilities;
 
-public class GameController : SingletonMonoBehaviour<GameController> {
-
-    [SerializeField]
-    GameData _gameData;
-    public static GameData gameData {
-        get { return instance._gameData; }
-    }
-
-    public float cameraWidth = 7f;
+public class BoardController : SingletonMonoBehaviour<BoardController> {
     public int sizeBoardX = 6;
     public int sizeBoardY = 6;
     public int minMatch = 3;
-    public float swapSpeed = .15f;
-    public float fallSpeed = .5f;
-    public bool preventInitialMatches;
     public GemBase[, ] gemBoard;
     public GameObject gemPrefab;
-    public override void Awake() {
-        base.Awake();
-        MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
-        CreateBoard();
-    }
 
     public static Vector3 GetWorldPosition(Vector2Int position) {
         return new Vector2(
@@ -33,19 +17,19 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         );
     }
 
-    public void CreateBoard() {
-        gemBoard = new GemBase[sizeBoardX, sizeBoardY];
+    public static void CreateBoard() {
+        instance.gemBoard = new GemBase[instance.sizeBoardX, instance.sizeBoardY];
 
-        for(int i = 0; i < sizeBoardX; ++i) {
-            for(int j = 0; j < sizeBoardY; ++j) {
-                GemBase gem = CreateGem(i, j);
+        for(int i = 0; i < instance.sizeBoardX; ++i) {
+            for(int j = 0; j < instance.sizeBoardY; ++j) {
+                GemBase gem = instance.CreateGem(i, j);
 
-                if(preventInitialMatches)
+                if(GameController.instance.preventInitialMatches)
                     while(GetMatchInfo(gem).isValid) {
                         gem.type = MiscellaneousUtils.Choose((GemType[]) System.Enum.GetValues(typeof(GemType)));
                     }
 
-                StartCoroutine(gem.IEMoveTo(GetWorldPosition(gem.position), fallSpeed));
+                instance.StartCoroutine(gem.MoveTo(GetWorldPosition(gem.position), GameController.instance.fallSpeed));
             }
         }
     }
@@ -73,10 +57,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
     IEnumerator SwapGems(GemBase from, GemBase to) {
 
-        StartCoroutine(from.IEMoveTo(GetWorldPosition(to.position), swapSpeed));
-        StartCoroutine(to.IEMoveTo(GetWorldPosition(from.position), swapSpeed));
+        StartCoroutine(from.MoveTo(GetWorldPosition(to.position), GameController.instance.swapSpeed));
+        StartCoroutine(to.MoveTo(GetWorldPosition(from.position), GameController.instance.swapSpeed));
 
-        yield return new WaitForSeconds(swapSpeed);
+        yield return new WaitForSeconds(GameController.instance.swapSpeed);
 
         Vector2Int fromPosition = from.position;
         from.SetPosition(to.position);
@@ -156,9 +140,9 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         foreach(Vector3Int fall in fallPositions) {
             for(int y = fall.y + fall.z; y < instance.sizeBoardY && instance.gemBoard[fall.x, y]; ++y) {
                 GemBase gem = instance.gemBoard[fall.x, y];
-                StartCoroutine(gem.IEMoveTo(
+                StartCoroutine(gem.MoveTo(
                     GetWorldPosition(new Vector2Int(fall.x, y - fall.z)),
-                    fall.z * swapSpeed/1.5f
+                    fall.z * GameController.instance.swapSpeed/1.5f
                 ));
                 gem.SetPosition(new Vector2Int(fall.x, y - fall.z));
             }
@@ -169,10 +153,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
                         fall.x, instance.sizeBoardY - i - (instance.sizeBoardY - fall.z)
                     )) + Vector3.up * (Camera.main.orthographicSize + sizeBoardY/2)
                 );
-                StartCoroutine(gem.IEMoveTo(GetWorldPosition(gem.position), fallSpeed));
+                StartCoroutine(gem.MoveTo(GetWorldPosition(gem.position), GameController.instance.fallSpeed));
             }
         }
-        yield return new WaitForSeconds(fallSpeed);
+        yield return new WaitForSeconds(GameController.instance.fallSpeed);
     }
     
     List<GemBase> GetHorizontalMatches(GemBase gem) {
@@ -292,16 +276,16 @@ public class GameController : SingletonMonoBehaviour<GameController> {
             gem.GetComponent<SpriteRenderer>().sortingOrder = 1;
             gem.transform.localScale *= 1.2f;
         }
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(GameController.instance.swapSpeed);
         foreach(GemBase gem in matches) {
-            StartCoroutine(gem.IEMoveTo(
+            StartCoroutine(gem.MoveTo(
                 new Vector3(
                     gem.transform.position.x,
                     -(Camera.main.orthographicSize + .5f) + gem.transform.position.y - sizeBoardY/2
                 ),
-                .5f
+                GameController.instance.fallSpeed
             ));
-            Destroy(gem.gameObject, 1f);
+            Destroy(gem.gameObject, GameController.instance.fallSpeed);
         }
     }
 }

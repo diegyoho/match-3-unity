@@ -26,14 +26,10 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
     public void SetPosition(Vector2Int position) {
         this.position = position;
-        GameController.instance.gemBoard[position.x, position.y] = this;
+        BoardController.instance.gemBoard[position.x, position.y] = this;
     }
 
-    public void MoveTo(Vector2Int position) {
-        transform.position = GameController.GetWorldPosition(position);
-    }
-
-    public IEnumerator IEMoveTo(Vector3 target, float duration) {
+    public IEnumerator MoveTo(Vector3 target, float duration) {
         
         Vector3 direction = target - transform.position;
         float distance = direction.magnitude;
@@ -65,26 +61,26 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
                 int swapX = (int) (position.x + Mathf.Sign(delta.x));
 
-                if(swapX < 0 || swapX >= GameController.instance.sizeBoardX) {
+                if(swapX < 0 || swapX >= BoardController.instance.sizeBoardX) {
                     TouchUp();
                     return;
                 }
 
-                otherGem = GameController.instance.gemBoard[swapX, position.y];
+                otherGem = BoardController.instance.gemBoard[swapX, position.y];
             } else {
                 
                 int swapY = (int) (position.y + Mathf.Sign(delta.y));
 
-                if(swapY < 0 || swapY >= GameController.instance.sizeBoardY) {
+                if(swapY < 0 || swapY >= BoardController.instance.sizeBoardY) {
                     TouchUp();
                     return;
                 }
 
-                otherGem = GameController.instance.gemBoard[position.x, swapY];
+                otherGem = BoardController.instance.gemBoard[position.x, swapY];
             }
 
             if(otherGem) {
-                GameController.TryMatch(this, otherGem);
+                BoardController.TryMatch(this, otherGem);
             }
 
             TouchUp();
