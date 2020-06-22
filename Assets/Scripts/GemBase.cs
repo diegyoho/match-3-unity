@@ -51,7 +51,7 @@ public class GemBase : MonoBehaviour, ITouchHandler {
     }
 
     IEnumerator IEMatched() {
-        
+
         spr.sortingOrder = 1;
         Color c = spr.color;
         c.a = 0.5f;
@@ -68,7 +68,7 @@ public class GemBase : MonoBehaviour, ITouchHandler {
     }
 
     public void TouchDown() {
-        // Debug.Log($"{type}, {position}");
+        
     }
 
     public void TouchDrag() {

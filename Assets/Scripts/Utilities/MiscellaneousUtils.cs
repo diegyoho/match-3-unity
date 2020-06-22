@@ -11,14 +11,14 @@ namespace Utilities {
 		public static int[, ] coord8 = new int[, ] { { 0, 1 }, {-1, 1 }, {-1, 0 }, {-1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
 
 		// Preenche um Vetor com um valor definido
-		public static void Populate<T>(T[] arr, T value) {
+		public static void Populate<T>(this T[] arr, T value) {
 			for (int i = 0; i < arr.Length; i++) {
 				arr[i] = value;
 			}
 		}
 
 		// Preenche uma Matriz com um valor definido
-		public static void Populate<T>(T[, ] arr, T value) {
+		public static void Populate<T>(this T[, ] arr, T value) {
 			for (int j = 0; j < arr.GetLength(0); ++j) {
 				for (int i = 0; i < arr.GetLength(1); ++i) {
 					arr[j, i] = value;
@@ -27,7 +27,7 @@ namespace Utilities {
 		}
 
 		// Preenche uma Área da Matriz com um valor definido
-		public static void PopulateArea<T>(T[, ] arr, T value, int x, int y, int xLength, int yLength) {
+		public static void PopulateArea<T>(this T[, ] arr, T value, int x, int y, int xLength, int yLength) {
 			for (int j = y; j < y + yLength; ++j) {
 				for (int i = x; i < x + xLength; ++i) {
 					arr[j, i] = value;

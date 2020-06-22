@@ -112,16 +112,20 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             yield return StartCoroutine(SwapGems(from, to));
         } else {
             List<GemBase> matches = new List<GemBase>();
-            if(matchFrom.isValid)
+            List<Vector3Int> fallPositions = new List<Vector3Int>();
+            
+            if(matchFrom.isValid) {
                 matches.AddRange(matchFrom.matches);
-            if(matchTo.isValid)
+                fallPositions.AddRange(matchFrom.GetFallPositions());
+            }
+
+            if(matchTo.isValid) {
                 matches.AddRange(matchTo.matches);
+                fallPositions.AddRange(matchTo.GetFallPositions());
+            }
             
             yield return StartCoroutine(DestroyGems(matches));
-            // yield return StartCoroutine(FallGems(MatchInfo.MergeFallPositions(
-            //     matchFrom.fallPositions,
-            //     matchTo.fallPositions
-            // )));
+            yield return StartCoroutine(FallGems(fallPositions));
 
             // yield return StartCoroutine(UpdateBoard());
         }
@@ -167,24 +171,34 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     IEnumerator FallGems(List<Vector3Int> fallPositions) {
-        
+        int[] heights = new int[width];
+        heights.Populate(0);
+
         foreach(Vector3Int fall in fallPositions) {
-            for(int y = fall.y + fall.z; y < height && gemBoard[fall.x, y]; ++y) {
-                GemBase gem = gemBoard[fall.x, y];
+            
+            GemBase gem = GetGem(fall.x, fall.y + fall.z);
+            while(gem) {
+                int y = gem.position.y;
                 gem.StartCoroutine(gem.MoveTo(
-                    GetWorldPosition(new Vector2Int(fall.x, y - fall.z)),
-                    fall.z * GameController.instance.swapSpeed/1.5f
+                    GetWorldPosition(new Vector2Int(fall.x, y - (fall.z + heights[fall.x]))),
+                    (fall.z + heights[fall.x]) * GameController.instance.swapSpeed/1.5f
                 ));
-                gem.SetPosition(new Vector2Int(fall.x, y - fall.z));
+
+                gem.SetPosition(new Vector2Int(fall.x, y - (fall.z + heights[fall.x])));
+                gem = GetGem(fall.x, y + 1);
             }
-            for(int i = fall.z; i > 0; --i) {
-                GemBase gem = instance.CreateGem(
-                    fall.x, height - i,
+
+            heights[fall.x] += fall.z;
+        }
+        for(int x = 0; x < heights.Length; ++x) {
+            for(int y = height - heights[x]; y < height; ++y) {
+                GemBase newGem = instance.CreateGem(
+                    x, y,
                     GetWorldPosition(new Vector2Int(
-                        fall.x, height - i - (height - fall.z)
+                        x, y - (height - heights[x])
                     )) + Vector3.up * (Camera.main.orthographicSize + height/2)
                 );
-                gem.StartCoroutine(gem.MoveTo(GetWorldPosition(gem.position), GameController.instance.fallSpeed));
+                newGem.StartCoroutine(newGem.MoveTo(GetWorldPosition(newGem.position), GameController.instance.fallSpeed));
             }
         }
         yield return new WaitForSeconds(GameController.instance.fallSpeed);

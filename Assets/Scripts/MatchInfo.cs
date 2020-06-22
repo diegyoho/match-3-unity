@@ -116,7 +116,11 @@ public class MatchInfo {
         _matches.ForEach(match => {
             int id = fallPositions.FindIndex(f => f.x == match.position.x);
             if(id > -1) {
-                fallPositions[id] += new Vector3Int(0, 0, 1);
+                fallPositions[id] = new Vector3Int(
+                    match.position.x,
+                    (int) Mathf.Min(fallPositions[id].y, match.position.y),
+                    fallPositions[id].z + 1
+                );
             } else {
                 fallPositions.Add(new Vector3Int(
                     match.position.x,
