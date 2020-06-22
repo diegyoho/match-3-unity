@@ -5,7 +5,6 @@ using Utilities;
 
 public class GameController : SingletonMonoBehaviour<GameController> {
 
-    List<GemBase> matchedGems = new List<GemBase>();
     [SerializeField]
     GameData _gameData;
     public static GameData gameData {
@@ -120,7 +119,6 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     }
 
     IEnumerator FindChainMatches() {
-        
         List<GemBase> gems = MiscellaneousUtils.GetList(gemBoard);
         List<MatchInfo> matchInfos = new List<MatchInfo>();
 
@@ -137,16 +135,14 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
         if(matchInfos.Count > 0) {
             
-            // yield return new WaitForSeconds(fallSpeed);
-            
             List<Vector3Int> fallPositions = new List<Vector3Int>();
-            
+            List<GemBase> matchesToDestroy = new List<GemBase>();
             foreach(MatchInfo matchInfo in matchInfos) {
-                yield return StartCoroutine(DestroyGems(matchInfo.matches));
-                
+                matchesToDestroy.AddRange(matchInfo.matches);
                 fallPositions = MatchInfo.MergeFallPositions(fallPositions, matchInfo.fallPositions);
             }
 
+            yield return StartCoroutine(DestroyGems(matchesToDestroy));
             yield return StartCoroutine(FallGems(fallPositions));
         } else {
             yield break;
@@ -230,41 +226,57 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
         MatchInfo matchInfo = new MatchInfo();
         
-        if(horizontalMatches.Count + 1 >= instance.minMatch) {
-            matchInfo.type = MatchType.Horizontal;
-            
-            matchInfo.startHorizontalPosition = gem.position;
-            horizontalMatches.ForEach(g => {
-                if(g.position.x < matchInfo.startHorizontalPosition.x)
-                    matchInfo.startHorizontalPosition = g.position;
-            });
+        int crossCheck = 0;
+        do {
+            if(horizontalMatches.Count + 1 >= instance.minMatch) {
+                matchInfo.type = MatchType.Horizontal;
+                
+                matchInfo.startHorizontalPosition = gem.position;
+                horizontalMatches.ForEach(g => {
+                    if(g.position.x < matchInfo.startHorizontalPosition.x)
+                        matchInfo.startHorizontalPosition = g.position;
+                });
 
-            matchInfo.horizontalLenght = horizontalMatches.Count + 1;
-            matchInfo.startVerticalPosition = matchInfo.startHorizontalPosition;
-            matchInfo.verticalLenght = 1;
+                matchInfo.horizontalLenght = horizontalMatches.Count + 1;
+                matchInfo.startVerticalPosition = matchInfo.startHorizontalPosition;
+                matchInfo.verticalLenght = 1;
 
-            matchInfo.matches.AddRange(horizontalMatches);
-        }
-
-        if(verticalMatches.Count + 1 >= instance.minMatch) {
-            matchInfo.type = matchInfo.type == MatchType.Horizontal ? MatchType.Both : MatchType.Vertical;
-            
-            matchInfo.startVerticalPosition = gem.position;
-            verticalMatches.ForEach(g => {
-                if(g.position.y < matchInfo.startVerticalPosition.y)
-                    matchInfo.startVerticalPosition = g.position;
-            });
-
-            matchInfo.verticalLenght = verticalMatches.Count + 1;
-            
-            if(matchInfo.type == MatchType.Vertical) {
-                matchInfo.startHorizontalPosition = matchInfo.startVerticalPosition;
-                matchInfo.horizontalLenght = 1;
+                matchInfo.matches.AddRange(horizontalMatches);
+            } else if (verticalMatches.Count + 1 >= instance.minMatch) {
+                horizontalMatches = instance.GetHorizontalMatches(verticalMatches[crossCheck]);
+            } else {
+                break;
             }
-            
-            matchInfo.matches.AddRange(verticalMatches);
-        }
+            crossCheck++;
+        } while(!matchInfo.isValid && crossCheck < verticalMatches.Count);
+        
+        crossCheck = 0;
+        do {
+            if(verticalMatches.Count + 1 >= instance.minMatch) {
+                matchInfo.type = matchInfo.type == MatchType.Horizontal ? MatchType.Both : MatchType.Vertical;
+                
+                matchInfo.startVerticalPosition = gem.position;
+                verticalMatches.ForEach(g => {
+                    if(g.position.y < matchInfo.startVerticalPosition.y)
+                        matchInfo.startVerticalPosition = g.position;
+                });
 
+                matchInfo.verticalLenght = verticalMatches.Count + 1;
+                
+                if(matchInfo.type == MatchType.Vertical) {
+                    matchInfo.startHorizontalPosition = matchInfo.startVerticalPosition;
+                    matchInfo.horizontalLenght = 1;
+                }
+                
+                matchInfo.matches.AddRange(verticalMatches);
+            } else if (horizontalMatches.Count + 1 >= instance.minMatch) {
+                verticalMatches = instance.GetVerticalMatches(horizontalMatches[crossCheck]);
+            } else {
+                break;
+            }
+            crossCheck++;
+        } while((!matchInfo.isValid || matchInfo.type == MatchType.Horizontal) && crossCheck < horizontalMatches.Count);
+        
         if(matchInfo.isValid) {
             matchInfo.matches.Add(gem);
             matchInfo.CalcFallPositions();
@@ -283,7 +295,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         yield return new WaitForSeconds(.1f);
         foreach(GemBase gem in matches) {
             StartCoroutine(gem.IEMoveTo(
-                new Vector3(gem.transform.position.x, -(Camera.main.orthographicSize + 1)),
+                new Vector3(
+                    gem.transform.position.x,
+                    -(Camera.main.orthographicSize + .5f) + gem.transform.position.y - sizeBoardY/2
+                ),
                 .5f
             ));
             Destroy(gem.gameObject, 1f);

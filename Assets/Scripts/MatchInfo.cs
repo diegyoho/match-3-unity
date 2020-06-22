@@ -57,7 +57,7 @@ public class MatchInfo {
 
             if(id >= 0) {
                 int diffY = fB.y - fallA[id].y;
-
+                
                 if(Mathf.Abs(diffY) == 1) {
                     fallA[id] = new Vector3Int(
                         fallA[id].x,
