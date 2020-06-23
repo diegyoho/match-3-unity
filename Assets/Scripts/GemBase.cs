@@ -30,11 +30,14 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         BoardController.gemBoard[position.x, position.y] = this;
     }
 
-    public void MoveTo(Vector3 target, float duration) {
+    public float MoveTo(Vector3 target, float speed) {
         if(moveTo != null)
             StopCoroutine(moveTo);
         
+        float duration = (target - transform.position).magnitude / speed;
         moveTo = StartCoroutine(IEMoveTo(target, duration));
+
+        return duration;
     }
 
     IEnumerator IEMoveTo(Vector3 target, float duration) {
@@ -67,17 +70,18 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         spr.color = c;
         transform.localScale = Vector3.one * 1.2f;
 
-        yield return new WaitForSeconds(GameController.instance.swapSpeed);
+        yield return new WaitForSeconds(.1f);
 
-        MoveTo(
+        float duration = MoveTo(
             new Vector3(
                 transform.position.x,
                 transform.position.y - (Camera.main.orthographicSize + 1f +
                 ((BoardController.height/2) - 0.5f))
             ),
-            GameController.instance.fallSpeed
+            GameController.instance.fallSpeed * 2
         );
-        Destroy(gameObject, GameController.instance.fallSpeed);
+
+        Destroy(gameObject, duration);
     }
 
     public void TouchDown() {

@@ -49,8 +49,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
                 gem.MoveTo(
                     GetWorldPosition(gem.position),
-                    (gem.transform.position - GetWorldPosition(gem.position)).magnitude *
-                    GameController.instance.fallSpeed/5
+                    GameController.instance.fallSpeed
                 );
             }
         }
@@ -98,10 +97,10 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     IEnumerator IESwapGems(GemBase from, GemBase to) {
 
-        from.MoveTo(GetWorldPosition(to.position), GameController.instance.swapSpeed);
-        to.MoveTo(GetWorldPosition(from.position), GameController.instance.swapSpeed);
+        float durationFrom = from.MoveTo(GetWorldPosition(to.position), GameController.instance.swapSpeed);
+        float durationTo = to.MoveTo(GetWorldPosition(from.position), GameController.instance.swapSpeed);
 
-        yield return new WaitForSeconds(GameController.instance.swapSpeed);
+        yield return new WaitForSeconds(Mathf.Max(durationFrom, durationTo));
 
         SwapGems(from, to);
     }
@@ -128,7 +127,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             TouchController.cancel = false;
         } else {
             List<GemBase> matches = new List<GemBase>();
-            List<Vector3Int> fallPositions = new List<Vector3Int>();
+            List<Vector2Int> fallPositions = new List<Vector2Int>();
             
             if(matchFrom.isValid) {
                 matches.AddRange(matchFrom.matches);
@@ -186,7 +185,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
         if(matchInfos.Count > 0) {
             
-            List<Vector3Int> fallPositions = new List<Vector3Int>();
+            List<Vector2Int> fallPositions = new List<Vector2Int>();
             List<GemBase> matchesToDestroy = new List<GemBase>();
             foreach(MatchInfo matchInfo in matchInfos) {
                 matchesToDestroy.AddRange(matchInfo.matches);
@@ -199,39 +198,46 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         }
     }
 
-    IEnumerator FallGems(List<Vector3Int> fallPositions) {
+    IEnumerator FallGems(List<Vector2Int> fallPositions) {
+        float maxDuration = 0;
         foreach(Vector3Int fall in fallPositions) {
             int fallY = 0;
             for(int y = fall.y; y < height; ++y) {
                 GemBase gem = GetGem(fall.x, y);
                 if(gem) {
-                    gem.MoveTo(
+                    float duration = gem.MoveTo(
                         GetWorldPosition(new Vector2Int(fall.x, y - fallY)),
-                        fallY * GameController.instance.fallSpeed/5
+                        GameController.instance.fallSpeed
                     );
 
                     gem.SetPosition(new Vector2Int(fall.x, y - fallY));
+
+                    if(duration > maxDuration)
+                        maxDuration = duration;
                 } else {
                     fallY++;
                 }
             }
 
-            for(int y = height - fall.z; y < height; ++y) {
+            for(int y = height - fallY; y < height; ++y) {
                 GemBase newGem = instance.CreateGem(
                     fall.x, y,
                     GetWorldPosition(new Vector2Int(
-                        fall.x, y - (height - fall.z)
+                        fall.x, y - (height - fallY)
                     )) + Vector3.up * (Camera.main.orthographicSize + height/2)
                 );
-                newGem.MoveTo(
+                
+                float duration = newGem.MoveTo(
                     GetWorldPosition(newGem.position),
-                    (newGem.transform.position - GetWorldPosition(newGem.position)).magnitude *
-                    GameController.instance.fallSpeed/5
+                    GameController.instance.fallSpeed
                 );
+
+                if(duration > maxDuration)
+                    maxDuration = duration;
             }
         }
 
-        yield return new WaitForSeconds(GameController.instance.fallSpeed);
+        yield return new WaitForSeconds(maxDuration);
     }
     
     public static MatchInfo GetHorizontalMatch(GemBase gem) {
@@ -320,17 +326,25 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     public IEnumerator ShuffleBoard() {
         gemBoard = MiscellaneousUtils.ShuffleMatrix(gemBoard);
-
+        
+        float maxDuration = 0;
         for(int j = 0; j < height; ++j) {
             for(int i = 0; i < width; ++i) {
                 gemBoard[i, j].SetPosition(new Vector2Int(i, j));
-                gemBoard[i, j].MoveTo(
+                float duration = gemBoard[i, j].MoveTo(
                     GetWorldPosition(gemBoard[i, j].position),
-                    GameController.instance.fallSpeed
+                    GameController.instance.fallSpeed * (
+                        gemBoard[i, j].transform.position -
+                        GetWorldPosition(gemBoard[i, j].position)
+                    ).magnitude/3
                 );
+
+                if(duration > maxDuration)
+                    maxDuration = duration;
             }
         }
-        yield return new WaitForSeconds(GameController.instance.fallSpeed);
+
+        yield return new WaitForSeconds(maxDuration);
     }
 
     IEnumerator DestroyGems(List<GemBase> matches) {
@@ -339,6 +353,6 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             gemBoard[gem.position.x, gem.position.y] = null;
             gem.Matched();
         }
-        yield return new WaitForSeconds(GameController.instance.swapSpeed);
+        yield return new WaitForSeconds(.1f);
     }
 }

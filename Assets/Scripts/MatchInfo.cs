@@ -111,52 +111,39 @@ public class MatchInfo {
     }
 
     // Position(x, y) and Height(z)
-    public List<Vector3Int> GetFallPositions() {
-        List<Vector3Int> fallPositions = new List<Vector3Int>();
+    public List<Vector2Int> GetFallPositions() {
+        List<Vector2Int> fallPositions = new List<Vector2Int>();
 
         _matches.ForEach(match => {
             int id = fallPositions.FindIndex(f => f.x == match.position.x);
-            if(id > -1) {
-                fallPositions[id] = new Vector3Int(
-                    match.position.x,
-                    (int) Mathf.Min(fallPositions[id].y, match.position.y),
-                    fallPositions[id].z + 1
-                );
+            if(id > -1 && match.position.y < fallPositions[id].y) {
+                fallPositions[id] = match.position;
             } else {
-                fallPositions.Add(new Vector3Int(
-                    match.position.x,
-                    match.position.y,
-                    1
-                ));
+                fallPositions.Add(match.position);
             }
         });
 
         return fallPositions;
     }
 
-    public static List<Vector3Int> JoinFallPositions(List<Vector3Int> matchA, List<Vector3Int> matchB) {
-        List<Vector3Int> fallPositions = new List<Vector3Int>();
+    public static List<Vector2Int> JoinFallPositions(List<Vector2Int> matchA, List<Vector2Int> matchB) {
+        List<Vector2Int> fallPositions = new List<Vector2Int>();
 
         if(matchA.Count == 0)
             return matchB;
         else if(matchB.Count == 0)
             return matchA;
 
-        matchA.ForEach(currentFall => {
-            int id = matchB.FindIndex(f => f.x == currentFall.x);
-            if(id > -1) {
-                fallPositions.Add(new Vector3Int(
-                    currentFall.x,
-                    (int) Mathf.Min(matchB[id].y, currentFall.y),
-                    matchB[id].z + currentFall.z
-                ));
-                matchB.RemoveAt(id);
+        fallPositions.AddRange(matchA);
+
+        matchB.ForEach(currentFall => {
+            int id = fallPositions.FindIndex(f => f.x == currentFall.x);
+            if(id > -1 && currentFall.y < fallPositions[id].y) {
+                fallPositions[id] = currentFall;
             } else {
                 fallPositions.Add(currentFall);
             }
         });
-
-        fallPositions.AddRange(matchB);
 
         return fallPositions;
     }
