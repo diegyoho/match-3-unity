@@ -5,6 +5,8 @@ using Utilities;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class GemBase : MonoBehaviour, ITouchHandler {
+
+    Coroutine moveTo = null;
     
     [HideInInspector]
     public SpriteRenderer spr;
@@ -28,7 +30,14 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         BoardController.gemBoard[position.x, position.y] = this;
     }
 
-    public IEnumerator MoveTo(Vector3 target, float duration) {
+    public void MoveTo(Vector3 target, float duration) {
+        if(moveTo != null)
+            StopCoroutine(moveTo);
+        
+        moveTo = StartCoroutine(IEMoveTo(target, duration));
+    }
+
+    IEnumerator IEMoveTo(Vector3 target, float duration) {
         
         Vector3 direction = target - transform.position;
         float distance = direction.magnitude;
@@ -60,14 +69,14 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
         yield return new WaitForSeconds(GameController.instance.swapSpeed);
 
-        StartCoroutine(MoveTo(
+        MoveTo(
             new Vector3(
                 transform.position.x,
                 transform.position.y - (Camera.main.orthographicSize + 1f +
                 ((BoardController.height/2) - 0.5f))
             ),
             GameController.instance.fallSpeed
-        ));
+        );
         Destroy(gameObject, GameController.instance.fallSpeed);
     }
 
@@ -84,23 +93,11 @@ public class GemBase : MonoBehaviour, ITouchHandler {
             if(Mathf.Abs(delta.x) > Mathf.Abs(delta.y)) {
 
                 int swapX = (int) (position.x + Mathf.Sign(delta.x));
-
-                if(swapX < 0 || swapX >= BoardController.width) {
-                    TouchUp();
-                    return;
-                }
-
-                otherGem = BoardController.gemBoard[swapX, position.y];
+                otherGem = BoardController.GetGem(swapX, position.y);
             } else {
                 
                 int swapY = (int) (position.y + Mathf.Sign(delta.y));
-
-                if(swapY < 0 || swapY >= BoardController.height) {
-                    TouchUp();
-                    return;
-                }
-
-                otherGem = BoardController.gemBoard[position.x, swapY];
+                otherGem = BoardController.GetGem(position.x, swapY);
             }
 
             if(otherGem) {

@@ -133,4 +133,31 @@ public class MatchInfo {
 
         return fallPositions;
     }
+
+    public static List<Vector3Int> JoinFallPositions(List<Vector3Int> matchA, List<Vector3Int> matchB) {
+        List<Vector3Int> fallPositions = new List<Vector3Int>();
+
+        if(matchA.Count == 0)
+            return matchB;
+        else if(matchB.Count == 0)
+            return matchA;
+
+        matchA.ForEach(currentFall => {
+            int id = matchB.FindIndex(f => f.x == currentFall.x);
+            if(id > -1) {
+                fallPositions.Add(new Vector3Int(
+                    currentFall.x,
+                    (int) Mathf.Min(matchB[id].y, currentFall.y),
+                    matchB[id].z + currentFall.z
+                ));
+                matchB.RemoveAt(id);
+            } else {
+                fallPositions.Add(currentFall);
+            }
+        });
+
+        fallPositions.AddRange(matchB);
+
+        return fallPositions;
+    }
 }

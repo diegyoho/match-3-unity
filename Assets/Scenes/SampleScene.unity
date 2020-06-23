@@ -298,6 +298,7 @@ GameObject:
   - component: {fileID: 1282053296}
   - component: {fileID: 1282053298}
   - component: {fileID: 1282053299}
+  - component: {fileID: 1282053300}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -365,3 +366,16 @@ MonoBehaviour:
   _height: 6
   gemPrefab: {fileID: 6539906006310958499, guid: ee923fc9a7f328f4fb32dfaee3e8ee2b,
     type: 3}
+--- !u!114 &1282053300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1282053295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9a760e19a93fd642afaeee3c7848f33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hints: []
