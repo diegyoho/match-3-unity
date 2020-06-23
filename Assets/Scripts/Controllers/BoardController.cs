@@ -7,6 +7,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     Coroutine updateBoard = null;
     
+    [Header("Board Dimensions")]
     [SerializeField]
     int _width = 6;
     public static int width {
@@ -22,8 +23,11 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     public static GemBase[, ] gemBoard;
+
+    [Header("Gem Base Prefab")]
     public GameObject gemPrefab;
 
+    // Calculate Board Position into World
     public static Vector3 GetWorldPosition(Vector2Int position) {
         return new Vector2(
             position.x - ((width/2f) - 0.5f),
@@ -78,6 +82,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         );
     }
 
+    // Check if position is valid, then returns a Gem
     public static GemBase GetGem(int x, int y) {
         if(x < 0 || x >= width || y < 0 || y >= height)
             return null;
@@ -89,6 +94,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         return GetGem(position.x, position.y);
     }
 
+    // Swap position Gems
     public static void SwapGems(GemBase from, GemBase to) {
         Vector2Int fromPosition = from.position;
         from.SetPosition(to.position);
@@ -105,6 +111,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         SwapGems(from, to);
     }
 
+    // Check if Swap results in a Match
     public static void TryMatch(GemBase from, GemBase to) {
         HintController.StopCurrentHint();
         instance.StartCoroutine(instance.IETryMatch(from, to));
@@ -127,16 +134,16 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             yield return StartCoroutine(IESwapGems(from, to));
             TouchController.cancel = false;
         } else {
-            List<GemBase> matches = new List<GemBase>();
+            List<MatchInfo> matches = new List<MatchInfo>();
             List<Vector2Int> fallPositions = new List<Vector2Int>();
             
             if(matchFrom.isValid) {
-                matches.AddRange(matchFrom.matches);
+                matches.Add(matchFrom);
                 fallPositions = MatchInfo.JoinFallPositions(fallPositions, matchFrom.GetFallPositions());
             }
 
             if(matchTo.isValid) {
-                matches.AddRange(matchTo.matches);
+                matches.Add(matchTo);
                 fallPositions = MatchInfo.JoinFallPositions(fallPositions, matchTo.GetFallPositions());
             }
             
@@ -166,6 +173,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         }
     }
 
+    // Check for matches in all Board
     IEnumerator FindChainMatches() {
         List<GemBase> gems = MiscellaneousUtils.GetList(gemBoard);
         List<MatchInfo> matchInfos = new List<MatchInfo>();
@@ -177,20 +185,26 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             MatchInfo matchInfo = GetCrossMatch(current);
             if(matchInfo.isValid) {
                 matchInfo.matches.ForEach( gem => gems.Remove(gem));
+                
                 MatchInfo matchInfoSameType = matchInfos.Find(mi => mi.pivot.type == matchInfo.pivot.type);
-                if(matchInfoSameType != null)
+                if(matchInfoSameType != null) {
                     matchInfoSameType = MatchInfo.JoinCrossedMatches(matchInfoSameType, matchInfo);
-                else
-                    matchInfos.Add(matchInfo);
+                    if(matchInfoSameType.isValid) {
+                        matchInfos.Add(matchInfoSameType);
+                        continue;
+                    }
+                }
+
+                matchInfos.Add(matchInfo);
             }
         }
 
         if(matchInfos.Count > 0) {
             
             List<Vector2Int> fallPositions = new List<Vector2Int>();
-            List<GemBase> matchesToDestroy = new List<GemBase>();
+            List<MatchInfo> matchesToDestroy = new List<MatchInfo>();
             foreach(MatchInfo matchInfo in matchInfos) {
-                matchesToDestroy.AddRange(matchInfo.matches);
+                matchesToDestroy.Add(matchInfo);
                 fallPositions = MatchInfo.JoinFallPositions(fallPositions, matchInfo.GetFallPositions());
             }
 
@@ -200,6 +214,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         }
     }
 
+    // Update position of Gems and create new ones
     IEnumerator FallGems(List<Vector2Int> fallPositions) {
         float maxDuration = 0;
         foreach(Vector3Int fall in fallPositions) {
@@ -328,7 +343,6 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     public IEnumerator ShuffleBoard() {
         gemBoard = MiscellaneousUtils.ShuffleMatrix(gemBoard);
-        
         float maxDuration = 0;
         for(int j = 0; j < height; ++j) {
             for(int i = 0; i < width; ++i) {
@@ -338,7 +352,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                     GameController.instance.fallSpeed * (
                         gemBoard[i, j].transform.position -
                         GetWorldPosition(gemBoard[i, j].position)
-                    ).magnitude/3
+                    ).magnitude/4
                 );
 
                 if(duration > maxDuration)
@@ -349,16 +363,20 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         yield return new WaitForSeconds(maxDuration);
     }
 
-    IEnumerator DestroyGems(List<GemBase> matches) {
+    IEnumerator DestroyGems(List<MatchInfo> matches) {
         float maxDuration = 0;
 
-        foreach(GemBase gem in matches) {
-            gem.StopAllCoroutines();
-            gemBoard[gem.position.x, gem.position.y] = null;
-            float duration = gem.Matched();
+        foreach(MatchInfo matchInfo in matches) {
+            foreach(GemBase gem in matchInfo.matches) {
+                gem.StopAllCoroutines();
+                gemBoard[gem.position.x, gem.position.y] = null;
+                float duration = gem.Matched();
 
-            if(duration > maxDuration)
-                maxDuration = duration;
+                if(duration > maxDuration)
+                    maxDuration = duration;
+            }
+
+            GameController.score += matchInfo.GetScore();
         }
         yield return new WaitForSeconds(maxDuration/2);
     }

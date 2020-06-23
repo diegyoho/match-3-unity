@@ -37,24 +37,19 @@ public class GemBase : MonoBehaviour, ITouchable {
         if(moveTo != null)
             StopCoroutine(moveTo);
         
-        float duration = (target - transform.position).magnitude / speed;
-        moveTo = StartCoroutine(IEMoveTo(target, duration));
+        moveTo = StartCoroutine(IEMoveTo(target, speed));
 
-        return duration;
+        return (target - transform.position).magnitude / speed;
     }
 
-    IEnumerator IEMoveTo(Vector3 target, float duration) {
+    IEnumerator IEMoveTo(Vector3 target, float speed) {
         
-        Vector3 direction = target - transform.position;
-        float distance = direction.magnitude;
-        direction.Normalize();
+        float distance = (target - transform.position).magnitude;
 
-        float time = 0;
-
-        while(time < duration) {
-            transform.position += direction * ((Time.deltaTime * distance)/duration);
-            time += Time.deltaTime;
+        while(!Mathf.Approximately(0.0f, distance)) {
+            transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
             yield return null;
+            distance = (target - transform.position).magnitude;
         }
 
         transform.position = target;
@@ -64,6 +59,7 @@ public class GemBase : MonoBehaviour, ITouchable {
     public float Matched() {
         animator.SetTrigger("matched");
         animator.Update(0);
+
         return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
     }
 

@@ -92,6 +92,13 @@ public class MatchInfo {
         }
     }
 
+    public int GetScore() {
+        if(!isValid)
+            return 0;
+
+        return _matches.Count % pivot.minMatch + 1;
+    }
+
     // Join Crossed Matches from same type
     public static MatchInfo JoinCrossedMatches(MatchInfo a, MatchInfo b) {
 
@@ -112,7 +119,6 @@ public class MatchInfo {
         return new MatchInfo();
     }
 
-    // Position(x, y) and Height(z)
     public List<Vector2Int> GetFallPositions() {
         List<Vector2Int> fallPositions = new List<Vector2Int>();
 

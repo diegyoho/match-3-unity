@@ -9,12 +9,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 	public static Vector3 touchPosition;
 	public static bool cancel = false;
 	ITouchable elementClicked;
-	// Use this for initialization
-	void Start() {
-
-	}
-
-	// Update is called once per frame
+	
 	void Update() {
         if (cancel) return;
 
