@@ -4,7 +4,7 @@ using UnityEngine;
 using Utilities;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class GemBase : MonoBehaviour, ITouchHandler {
+public class GemBase : MonoBehaviour, ITouchable {
 
     Coroutine moveTo = null;
     

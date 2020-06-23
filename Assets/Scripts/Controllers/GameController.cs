@@ -30,6 +30,8 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         BoardController.CreateBoard();
     }
 
+#if UNITY_EDITOR
+
     void Update() {
         if(Input.GetKeyDown(KeyCode.Space)) {
             StartCoroutine(BoardController.instance.ShuffleBoard());
@@ -42,4 +44,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
                 HintController.StopCurrentHint();
         }
     }
+
+#endif
+
 }

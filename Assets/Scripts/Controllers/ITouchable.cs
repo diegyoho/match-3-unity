@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ITouchHandler {
+public interface ITouchable {
     
     void TouchDown();
     void TouchDrag();

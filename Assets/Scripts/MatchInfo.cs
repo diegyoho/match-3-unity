@@ -44,8 +44,10 @@ public class MatchInfo {
     }
 
     public MatchInfo(List<GemBase> matches = null) {
-        if(matches != null)
+        if(matches != null) {
+            _pivot = matches[0].position;
             AddMatches(matches);
+        }
     }
 
     public bool TypeIs(MatchType type) {
@@ -93,7 +95,7 @@ public class MatchInfo {
     // Join Crossed Matches from same type
     public static MatchInfo JoinCrossedMatches(MatchInfo a, MatchInfo b) {
 
-        if(!(a.isValid && b.isValid) || a.pivot.type != a.pivot.type) {
+        if(!(a.isValid && b.isValid) || a.pivot.type != b.pivot.type) {
             return new MatchInfo();
         }
 

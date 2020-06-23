@@ -8,7 +8,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 
 	public static Vector3 touchPosition;
 	public static bool cancel = false;
-	ITouchHandler elementClicked;
+	ITouchable elementClicked;
 	// Use this for initialization
 	void Start() {
 
@@ -46,7 +46,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 				}
 			} else if (touch.phase == TouchPhase.Began) {
 				if (raycastHit) {
-					elementClicked = raycastHit.collider.GetComponent<ITouchHandler>();
+					elementClicked = raycastHit.collider.GetComponent<ITouchable>();
 				}
 				if (elementClicked != null)
 					elementClicked.TouchDown();
@@ -73,7 +73,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 			}
 		} else if (Input.GetMouseButtonDown(0)) {
 			if (raycastHit) {
-				elementClicked = raycastHit.collider.GetComponent<ITouchHandler>();
+				elementClicked = raycastHit.collider.GetComponent<ITouchable>();
 			}
 
 			if (elementClicked != null)
@@ -84,7 +84,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 
 #endif
 
-	public static void ClearElementClicked(ITouchHandler other) {
+	public static void ClearElementClicked(ITouchable other) {
 		if (instance.elementClicked == other) {
 			ClearElementClicked();
 		}

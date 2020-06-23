@@ -319,10 +319,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gameData: {fileID: 11400000, guid: dffda7e03a8d7bc48bde3ca9e3e6174e, type: 2}
-  cameraWidth: 7
+  cameraWidth: 0
   bg: {fileID: 143699019}
-  swapSpeed: 0.15
-  fallSpeed: 0.5
+  swapSpeed: 6
+  fallSpeed: 10
   preventInitialMatches: 1
 --- !u!4 &1282053297
 Transform:
@@ -362,8 +362,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2fbd309908a7484f87fa30ed2c865d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _width: 6
-  _height: 6
+  _width: 10
+  _height: 10
   gemPrefab: {fileID: 6539906006310958499, guid: ee923fc9a7f328f4fb32dfaee3e8ee2b,
     type: 3}
 --- !u!114 &1282053300
@@ -378,4 +378,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9a760e19a93fd642afaeee3c7848f33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hints: []
