@@ -9,19 +9,22 @@ public class GemBase : MonoBehaviour, ITouchHandler {
     Coroutine moveTo = null;
     
     [HideInInspector]
-    public SpriteRenderer spr;
+    public SpriteRenderer spriteRenderer;
+    [HideInInspector]
+    public Animator animator;
 
     public GemType type;
     public Vector2Int position;
     public int minMatch = 3;
     
     void Awake() {
-        spr = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
     }
 
     public void SetType(GemData gemData) {
         type = gemData.type;
-        spr.sprite = gemData.sprite;
+        spriteRenderer.sprite = gemData.sprite;
         minMatch = gemData.minMatch;
     }
 
@@ -58,30 +61,10 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
     }
 
-    public void Matched() {
-        StartCoroutine(IEMatched());
-    }
-
-    IEnumerator IEMatched() {
-
-        spr.sortingOrder = 1;
-        Color c = spr.color;
-        c.a = 0.5f;
-        spr.color = c;
-        transform.localScale = Vector3.one * 1.2f;
-
-        yield return new WaitForSeconds(.1f);
-
-        float duration = MoveTo(
-            new Vector3(
-                transform.position.x,
-                transform.position.y - (Camera.main.orthographicSize + 1f +
-                ((BoardController.height/2) - 0.5f))
-            ),
-            GameController.instance.fallSpeed * 2
-        );
-
-        Destroy(gameObject, duration);
+    public float Matched() {
+        animator.SetTrigger("matched");
+        animator.Update(0);
+        return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
     }
 
     public void TouchDown() {
@@ -115,5 +98,9 @@ public class GemBase : MonoBehaviour, ITouchHandler {
 
     public void TouchUp() {
         TouchController.ClearElementClicked();
+    }
+
+    public void DestroyGem() {
+        Destroy(gameObject);
     }
 }

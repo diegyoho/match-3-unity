@@ -11,20 +11,22 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         get { return instance._gameData; }
     }
 
-    public float cameraWidth = 7f;
+    public float cameraWidth;
     public GameObject bg;
     
-    public float swapSpeed = .15f;
-    public float fallSpeed = .5f;
+    public float swapSpeed;
+    public float fallSpeed;
     public bool preventInitialMatches;
     public override void Awake() {
         base.Awake();
-        MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
-        float bgHeight = bg.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
-        bg.transform.localScale = Vector3.one * (Camera.main.orthographicSize * 2 / bgHeight);
     }
 
     void Start() {
+        cameraWidth = BoardController.width + 1;
+        MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
+        float bgHeight = bg.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
+        bg.transform.localScale = Vector3.one * (Camera.main.orthographicSize * 2 / bgHeight);
+        
         BoardController.CreateBoard();
     }
 

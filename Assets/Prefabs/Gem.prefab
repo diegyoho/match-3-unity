@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2737918572922045918}
   - component: {fileID: 1562173510238005296}
   - component: {fileID: 4571077119328886446}
+  - component: {fileID: 2100746632092338692}
   - component: {fileID: 5978925978501162727}
   m_Layer: 0
   m_Name: Gem
@@ -121,6 +122,25 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.45
+--- !u!95 &2100746632092338692
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6539906006310958499}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 954b782890db15840975fee254c4f6f2, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &5978925978501162727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,5 +153,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 161114b61471d064f824963367cfef65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _type: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  type: 0
   position: {x: 0, y: 0}
+  minMatch: 3

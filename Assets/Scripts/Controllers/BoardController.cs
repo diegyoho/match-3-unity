@@ -26,8 +26,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     public static Vector3 GetWorldPosition(Vector2Int position) {
         return new Vector2(
-            position.x - ((width/2) - 0.5f),
-            position.y - ((height/2) - 0.5f)
+            position.x - ((width/2f) - 0.5f),
+            position.y - ((height/2f) - 0.5f)
         );
     }
 
@@ -348,11 +348,16 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     IEnumerator DestroyGems(List<GemBase> matches) {
+        float maxDuration = 0;
+
         foreach(GemBase gem in matches) {
             gem.StopAllCoroutines();
             gemBoard[gem.position.x, gem.position.y] = null;
-            gem.Matched();
+            float duration = gem.Matched();
+
+            if(duration > maxDuration)
+                maxDuration = duration;
         }
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(maxDuration);
     }
 }
