@@ -78,7 +78,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     GemBase CreateGem(int x, int y) {
         return CreateGem(
             x, y,
-            GetWorldPosition(new Vector2Int(x, y)) + Vector3.up * (Camera.main.orthographicSize + 1 + height/2)
+            GetWorldPosition(new Vector2Int(x, height))// + Vector3.up * (Camera.main.orthographicSize + 1 + height/2)
         );
     }
 
@@ -240,8 +240,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                 GemBase newGem = instance.CreateGem(
                     fall.x, y,
                     GetWorldPosition(new Vector2Int(
-                        fall.x, y - (height - fallY)
-                    )) + Vector3.up * (Camera.main.orthographicSize + height/2)
+                        fall.x, height//y - (height - fallY)
+                    )) // + Vector3.up * (Camera.main.orthographicSize + height/2)
                 );
                 
                 float duration = newGem.MoveTo(
@@ -342,6 +342,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     public IEnumerator ShuffleBoard() {
+        yield return new WaitForSeconds(.25f);
         gemBoard = MiscellaneousUtils.ShuffleMatrix(gemBoard);
         float maxDuration = 0;
         for(int j = 0; j < height; ++j) {
