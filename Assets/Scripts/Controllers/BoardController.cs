@@ -169,6 +169,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             yield return StartCoroutine(ShuffleBoard());
             UpdateBoard();
         } else {
+            HintController.StartHinting();
             TouchController.cancel = false;
         }
     }

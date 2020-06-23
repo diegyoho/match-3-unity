@@ -18,6 +18,7 @@ public class HintController : SingletonMonoBehaviour<HintController> {
 
     List<HintInfo> hints = new List<HintInfo>();
     HintInfo currentHint;
+    Coroutine hinting;
 
     public static bool hasHints {
         get { return instance.hints.Count > 0; }
@@ -101,5 +102,25 @@ public class HintController : SingletonMonoBehaviour<HintController> {
             instance.currentHint.currentSwap.Hint(false);
             instance.currentHint = null;
         }
+    }
+
+    public static void StartHinting() {
+        if(instance.hinting != null)
+            instance.StopCoroutine(instance.hinting);
+            
+        instance.hinting = instance.StartCoroutine(instance.IEStartHinting());
+    }
+
+    public static void StopHinting() {
+        StopCurrentHint();
+        if(instance.hinting != null)
+            instance.StopCoroutine(instance.hinting);
+    }
+
+    IEnumerator IEStartHinting() {
+        
+        StopCurrentHint();
+        yield return new WaitForSeconds(30f);
+        ShowHint();
     }
 }
