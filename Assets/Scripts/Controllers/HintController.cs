@@ -6,6 +6,7 @@ using Utilities;
 [System.Serializable]
 public class HintInfo {
     public GemBase gem;
+    public GemBase currentSwap;
     public List<GemBase> swaps = new List<GemBase>();
 
     public HintInfo(GemBase gem) {
@@ -15,7 +16,16 @@ public class HintInfo {
 
 public class HintController : SingletonMonoBehaviour<HintController> {
 
-    public List<HintInfo> hints = new List<HintInfo>();
+    List<HintInfo> hints = new List<HintInfo>();
+    HintInfo currentHint;
+
+    public static bool hasHints {
+        get { return instance.hints.Count > 0; }
+    }
+
+    public static bool isShowing {
+        get { return instance.currentHint != null; }
+    }
     
     HintInfo GetHint(GemBase gem, GemBase otherGem) {
         if(!(gem && otherGem))
@@ -44,7 +54,7 @@ public class HintController : SingletonMonoBehaviour<HintController> {
         return hintInfo;
     }
 
-    public static bool FindHints() {
+    public static void FindHints() {
         instance.hints.Clear();
 
         for(int j = 0; j < BoardController.height; ++j) {
@@ -70,7 +80,26 @@ public class HintController : SingletonMonoBehaviour<HintController> {
                 }
             }
         }
+    }
 
-        return instance.hints.Count > 0;
+    public static void ShowHint() {
+        StopCurrentHint();
+        if(hasHints) {
+            HintInfo hintInfo = instance.hints[Random.Range(0, instance.hints.Count)];
+            hintInfo.gem.Hint();
+            hintInfo.currentSwap = hintInfo.swaps[Random.Range(0, hintInfo.swaps.Count)];
+            hintInfo.currentSwap.Hint();
+            instance.currentHint = hintInfo;
+        } else {
+            instance.currentHint = null;
+        }
+    }
+
+    public static void StopCurrentHint() {
+        if(instance.currentHint != null) {
+            instance.currentHint.gem.Hint(false);
+            instance.currentHint.currentSwap.Hint(false);
+            instance.currentHint = null;
+        }
     }
 }

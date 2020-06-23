@@ -67,6 +67,10 @@ public class GemBase : MonoBehaviour, ITouchHandler {
         return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
     }
 
+    public void Hint(bool start = true) {
+        animator.SetBool("hinting", start);
+    }
+
     public void TouchDown() {
         
     }

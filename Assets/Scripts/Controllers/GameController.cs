@@ -34,5 +34,12 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         if(Input.GetKeyDown(KeyCode.Space)) {
             StartCoroutine(BoardController.instance.ShuffleBoard());
         }
+
+        if(Input.GetKeyDown(KeyCode.H)) {
+            if(!HintController.isShowing)
+                HintController.ShowHint();
+            else
+                HintController.StopCurrentHint();
+        }
     }
 }

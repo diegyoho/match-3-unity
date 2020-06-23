@@ -106,6 +106,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     public static void TryMatch(GemBase from, GemBase to) {
+        HintController.StopCurrentHint();
         instance.StartCoroutine(instance.IETryMatch(from, to));
     }
 
@@ -156,7 +157,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     IEnumerator IEUpdateBoard() {
         TouchController.cancel = true;
         yield return StartCoroutine(FindChainMatches());
-        if(!HintController.FindHints()) {
+        HintController.FindHints();
+        if(!HintController.hasHints) {
             yield return StartCoroutine(ShuffleBoard());
             UpdateBoard();
         } else {
@@ -358,6 +360,6 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             if(duration > maxDuration)
                 maxDuration = duration;
         }
-        yield return new WaitForSeconds(maxDuration);
+        yield return new WaitForSeconds(maxDuration/2);
     }
 }
