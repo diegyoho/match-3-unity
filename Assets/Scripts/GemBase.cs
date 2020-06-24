@@ -6,7 +6,8 @@ using Utilities;
 [RequireComponent(typeof(SpriteRenderer))]
 public class GemBase : MonoBehaviour, ITouchable {
 
-    Coroutine moveTo = null;
+    Coroutine moveToCoroutine = null;
+    Coroutine animationCoroutine = null;
     
     [HideInInspector]
     public SpriteRenderer spriteRenderer;
@@ -33,17 +34,17 @@ public class GemBase : MonoBehaviour, ITouchable {
         BoardController.gemBoard[position.x, position.y] = this;
     }
 
-    public float MoveTo(Vector3 target, float speed) {
-        if(moveTo != null)
-            StopCoroutine(moveTo);
+    public float MoveTo(Vector3 target, float speed, float delay = 0) {
+        if(moveToCoroutine != null)
+            StopCoroutine(moveToCoroutine);
         
-        moveTo = StartCoroutine(IEMoveTo(target, speed));
+        moveToCoroutine = StartCoroutine(IEMoveTo(target, speed, delay));
 
-        return (target - transform.position).magnitude / speed;
+        return ((target - transform.position).magnitude / speed) + delay;
     }
 
-    IEnumerator IEMoveTo(Vector3 target, float speed) {
-        
+    IEnumerator IEMoveTo(Vector3 target, float speed, float delay) {
+        yield return new WaitForSeconds(delay);
         float distance = (target - transform.position).magnitude;
 
         while(!Mathf.Approximately(0.0f, distance)) {
@@ -58,22 +59,36 @@ public class GemBase : MonoBehaviour, ITouchable {
 
     }
 
-    public float Creating() {
+    public float Creating(float delay = 0) {
+        if(animationCoroutine != null)
+            StopCoroutine(animationCoroutine);
+        
         animator.SetTrigger("creating");
-        animator.Update(0);
-
-        return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        animationCoroutine = StartCoroutine(IEAnimationDelay(delay));
+        
+        return animator.GetCurrentStateDuration() + delay;
     }
 
-    public float Matched() {
+    public float Matched(float delay = 0) {
+        if(animationCoroutine != null)
+            StopCoroutine(animationCoroutine);
+        
         animator.SetTrigger("matched");
-        animator.Update(0);
-
-        return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        animationCoroutine = StartCoroutine(IEAnimationDelay(delay));
+        
+        return animator.GetCurrentStateDuration() + delay;
     }
 
     public void Hint(bool start = true) {
         animator.SetBool("hinting", start);
+    }
+
+    IEnumerator IEAnimationDelay(float delay) {
+        animator.enabled = false;
+
+        yield return new WaitForSeconds(delay);
+
+        animator.enabled = true;
     }
 
     public void TouchDown() {

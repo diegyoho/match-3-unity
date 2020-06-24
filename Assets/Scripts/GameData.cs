@@ -39,6 +39,10 @@ public class GameData : SingletonScriptableObject<GameData> {
         get { return instance.comboMessages.Length; }
     }
 
+    public static GemData GemOfType(GemType type) {
+        return instance.gems.Find(gem => gem.type == type);
+    }
+
     public static GemData RandomGem() {
         return Miscellaneous.Choose(instance.gems);
     }

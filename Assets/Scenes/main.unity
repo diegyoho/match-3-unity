@@ -1174,6 +1174,7 @@ MonoBehaviour:
   _score: 0
   _currentGoalScore: 0
   _timeLeft: 0
+  gameData: {fileID: 11400000, guid: dffda7e03a8d7bc48bde3ca9e3e6174e, type: 2}
 --- !u!4 &1282053297
 Transform:
   m_ObjectHideFlags: 0
@@ -1214,8 +1215,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _width: 6
   _height: 8
-  gemPrefab: {fileID: 6539906006310958499, guid: ee923fc9a7f328f4fb32dfaee3e8ee2b,
-    type: 3}
 --- !u!114 &1282053300
 MonoBehaviour:
   m_ObjectHideFlags: 0

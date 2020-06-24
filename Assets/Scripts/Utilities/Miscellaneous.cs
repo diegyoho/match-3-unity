@@ -212,6 +212,7 @@ namespace Utilities {
 			return arr;
 		}
 
+		// If x is negative Then mod is m + x
 		public static int Mod(int x, int m) {
 			return (x % m + m) % m;
 		}
@@ -255,6 +256,20 @@ namespace Utilities {
 				}
 			}
 			return null;
+		}
+
+		public static float GetCurrentStateDuration(this Animator animator, int layerIndex = 0) {
+			animator.Update(0);
+
+			AnimatorClipInfo[] animatorClipInfos = animator.GetCurrentAnimatorClipInfo(layerIndex);
+			float speedMultiplier = animator.GetCurrentAnimatorStateInfo(0).speed;
+			
+			if(animatorClipInfos.Length == 0 || speedMultiplier == 0)
+				return 0;
+
+			float duration = animatorClipInfos[0].clip.length;
+        	
+			return duration/Mathf.Abs(speedMultiplier);
 		}
 	}
 

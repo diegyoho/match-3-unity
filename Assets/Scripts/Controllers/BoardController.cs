@@ -48,9 +48,15 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     public static float CreateBoard() {
         gemBoard = new GemBase[width, height];
         float maxDuration = 0;
-        for(int j = 0; j < height; ++j) {
+        float delayLine = 0;
+        for(int j = height - 1; j >= 0; --j) {
+            Debug.Log($"({j}) = {delayLine}");
             for(int i = 0; i < width; ++i) {
-                GemBase gem = instance.CreateGem(i, j);
+                GemBase gem = instance.CreateRandomGem(
+                    i, j, GetWorldPosition(new Vector2Int(i, j + 1)),
+                    delayLine
+                );
+
 
                 if(GameController.instance.preventInitialMatches)
                     while(GetCrossMatch(gem).isValid) {
@@ -59,17 +65,24 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
                 float duration = gem.MoveTo(
                     GetWorldPosition(gem.position),
-                    GameController.instance.fallSpeed
+                    GameController.instance.fallSpeed,
+                    delayLine
                 );
 
                 if(duration > maxDuration)
                     maxDuration = duration;
             }
+
+            delayLine = maxDuration;
         }
         return maxDuration;
     }
 
-    GemBase CreateGem(int x, int y, Vector3 worldPosition) {
+    GemBase CreateGem(
+        int x, int y, GemData type,
+        Vector3 worldPosition, float delay,
+        out float creatingDuration
+    ) {
 
         GemBase gem = Instantiate(
             Resources.Load<GameObject>("Prefabs/gemPrefab"),
@@ -79,16 +92,35 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         ).GetComponent<GemBase>();
 
         gem.SetPosition(new Vector2Int(x, y));
-        gem.SetType(GameData.RandomGem());
+        gem.SetType(type);
+
+        creatingDuration = gem.Creating(delay);
+
         return gem;
     }
 
-    // Create Gem on Top Screen
-    GemBase CreateGem(int x, int y) {
-        return CreateGem(
-            x, y,
-            GetWorldPosition(new Vector2Int(x, height))
-        );
+    
+
+    GemBase CreateRandomGem(
+        int x, int y, Vector3 worldPosition,
+        float delay, out float creatingDuration
+    ) {
+        return CreateGem(x, y, GameData.RandomGem(), worldPosition, delay, out creatingDuration);
+    }
+
+    
+
+    GemBase CreateRandomGem(
+        int x, int y, Vector3 worldPosition,
+        float delay
+    ) {
+        return CreateRandomGem(x, y, worldPosition, delay, out float _);
+    }
+
+    GemBase CreateRandomGem(
+        int x, int y, Vector3 worldPosition
+    ) {
+        return CreateRandomGem(x, y, worldPosition, 0);
     }
 
     // Check if position is valid, then returns a Gem
@@ -277,20 +309,21 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                     fallY++;
                 }
             }
-
-            for(int y = height - fallY; y < height; ++y) {
-                GemBase newGem = instance.CreateGem(
+            float delay = 0;
+            for(int y = height - 1; y >= height - fallY; --y) {
+                GemBase newGem = instance.CreateRandomGem(
                     fall.x, y,
                     GetWorldPosition(new Vector2Int(
-                        fall.x, height
-                    ))
+                        fall.x, y + 1
+                    )), delay
                 );
                 
                 float duration = newGem.MoveTo(
                     GetWorldPosition(newGem.position),
-                    GameController.instance.fallSpeed
+                    GameController.instance.fallSpeed,
+                    delay
                 );
-
+                delay = duration;
                 if(duration > maxDuration)
                     maxDuration = duration;
             }

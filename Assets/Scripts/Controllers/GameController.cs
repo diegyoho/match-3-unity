@@ -74,6 +74,9 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
     public static GameState state = GameState.Menu;
 
+    [SerializeField]
+    GameData gameData;
+
     void Start() {
         if(autoCameraWidth)
             cameraWidth = BoardController.width + 1;
