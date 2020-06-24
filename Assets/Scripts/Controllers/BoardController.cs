@@ -31,9 +31,6 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         }
     }
 
-    [Header("Gem Base Prefab")]
-    public GameObject gemPrefab;
-
     public static bool updatingBoard;
 
     // Calculate Board Position into World
@@ -75,7 +72,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     GemBase CreateGem(int x, int y, Vector3 worldPosition) {
 
         GemBase gem = Instantiate(
-            gemPrefab,
+            Resources.Load<GameObject>("Prefabs/gemPrefab"),
             worldPosition,
             Quaternion.identity,
             transform
@@ -412,34 +409,50 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     IEnumerator DestroyMatchedGems(List<MatchInfo> matches) {
         float maxDuration = 0;
         int score = 0;
+        
         foreach(MatchInfo matchInfo in matches) {
-            foreach(GemBase gem in matchInfo.matches) {
-                float duration = DestroyGems(matchInfo.matches);
+            float duration = DestroyGems(matchInfo.matches, matchInfo.pivot);
+            
+            if(duration > maxDuration)
+                maxDuration = duration;
 
-                if(duration > maxDuration)
-                    maxDuration = duration;
-            }
             matchCounter++;
             score += matchInfo.GetScore();
         }
+
         GameController.score += score * matchCounter;
         UIController.ShowMsg($"{ GameData.GetComboMessage(matchCounter - 1) }");
         SoundController.PlaySfx(GameData.GetAudioClip("match"));
+        
         yield return new WaitForSeconds(maxDuration/2);
     }
 
-    public static float DestroyGems(List<GemBase> matches = null) {
-        if(matches == null)
+    public static float DestroyGems(List<GemBase> matches = null, bool moveToPivot = false) {
+        Vector3 pivotPosition = Vector3.zero;
+        
+        if(matches == null) {
             matches = gemBoard.GetList();
+            moveToPivot = false;
+        } else if (moveToPivot && matches.Count > 0) {
+            pivotPosition = GetWorldPosition(matches[0].position);
+        }
 
         float maxDuration = 0;
 
         foreach(GemBase gem in matches) {
             gemBoard[gem.position.x, gem.position.y] = null;
             float duration = gem.Matched();
-            Destroy(gem.gameObject, duration);
+
+            if(moveToPivot)
+                duration = Mathf.Max(duration, gem.MoveTo(
+                    pivotPosition,
+                    GameController.instance.fallSpeed
+                ));
+
             if(duration > maxDuration)
                 maxDuration = duration;
+            
+            Destroy(gem.gameObject, maxDuration);
         }
         
         return maxDuration;

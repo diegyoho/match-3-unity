@@ -160,7 +160,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         if(show) {
             instance.changeGem = instance.StartCoroutine(instance.IEChangeGem());
         } else {
-            instance.gem.animator.SetTrigger("matched");
+            instance.gem.Matched();
             if(instance.changeGem != null) {
                 instance.StopCoroutine(instance.changeGem);
                 instance.changeGem = null;            }
@@ -170,11 +170,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     IEnumerator IEChangeGem() {
         gemMenu.gameObject.SetActive(true);
         gem.SetType(GameData.RandomGem());
-        instance.gem.animator.SetTrigger("creating");
-        yield return new WaitForSeconds(3);
+        
+        yield return new WaitForSeconds(gem.Creating() * 3);
 
-        gem.animator.SetTrigger("matched");
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(gem.Matched());
         
         changeGem = StartCoroutine(IEChangeGem());
     }

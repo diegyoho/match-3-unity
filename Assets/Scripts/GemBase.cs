@@ -58,6 +58,13 @@ public class GemBase : MonoBehaviour, ITouchable {
 
     }
 
+    public float Creating() {
+        animator.SetTrigger("creating");
+        animator.Update(0);
+
+        return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+    }
+
     public float Matched() {
         animator.SetTrigger("matched");
         animator.Update(0);
@@ -108,6 +115,6 @@ public class GemBase : MonoBehaviour, ITouchable {
     }
 
     public void DestroyGem() {
-        Destroy(gameObject);
+        Destroy(gameObject, Matched());
     }
 }
