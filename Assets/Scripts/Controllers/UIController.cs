@@ -23,12 +23,15 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     TextMeshProUGUI goalScoreText;
     [SerializeField]
     TextMeshProUGUI timeLeftText;
+    [SerializeField]
+    TextMeshProUGUI highscoreText;
 
     CanvasGroup currentScreen;
 
     float timePulse;
 
     public static void ShowMainScreen() {
+        UpdateHighScore(GameController.highscore);
         instance.StartCoroutine(instance.IEChangeScreen(instance.mainScreen, executeAfter: () => {
             GameController.ShowGemMenu();
         }));
@@ -47,6 +50,11 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     public static void UpdateScore(int score) {
         instance.scoreText.text = $"{ score }";
         instance.scoreText.transform.parent.GetComponent<Animator>().SetTrigger("pulse");
+    }
+
+    
+    public static void UpdateHighScore(int score) {
+        instance.highscoreText.text = $"High Score: { score }";
     }
 
     public static void UpdateGoalScore(int goalScore) {

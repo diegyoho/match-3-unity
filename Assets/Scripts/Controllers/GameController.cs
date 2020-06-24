@@ -39,6 +39,17 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         set {
             instance._score = value;
             UIController.UpdateScore(instance._score);
+
+            if(value > highscore)
+                highscore = value;
+        }
+    }
+
+    public static int highscore {
+        get { return PlayerPrefs.GetInt("match3-highscore", 0); }
+        set {
+            PlayerPrefs.SetInt("match3-highscore", value);
+            UIController.UpdateHighScore(value);
         }
     }
 
