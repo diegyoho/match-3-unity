@@ -128,6 +128,8 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     IEnumerator IEGameOver() {
         TouchController.cancel = true;
         state = GameState.Menu;
+        HintController.StopCurrentHint();
+        HintController.StopHinting();
         yield return new WaitForSeconds(BoardController.DestroyGems() + .5f);
         UIController.ShowMainScreen();
     }

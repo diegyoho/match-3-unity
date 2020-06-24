@@ -20,6 +20,8 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     HintInfo currentHint;
     Coroutine hinting;
 
+    public float hintDelay = 30f;
+
     public static bool hasHints {
         get { return instance.hints.Count > 0; }
     }
@@ -84,7 +86,6 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     }
 
     public static void ShowHint() {
-        StopCurrentHint();
         if(hasHints) {
             HintInfo hintInfo = instance.hints[Random.Range(0, instance.hints.Count)];
             hintInfo.gem.Hint();
@@ -105,14 +106,11 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     }
 
     public static void StartHinting() {
-        if(instance.hinting != null)
-            instance.StopCoroutine(instance.hinting);
-
-        instance.hinting = instance.StartCoroutine(instance.IEStartHinting());
+        if(instance.hinting == null)
+            instance.hinting = instance.StartCoroutine(instance.IEStartHinting());
     }
 
     public static void StopHinting() {
-        StopCurrentHint();
         if(instance.hinting != null)
             instance.StopCoroutine(instance.hinting);
         
@@ -121,8 +119,11 @@ public class HintController : SingletonMonoBehaviour<HintController> {
 
     IEnumerator IEStartHinting() {
         
-        StopCurrentHint();
-        yield return new WaitForSeconds(30f);
+        if(currentHint != null)
+            yield break;
+
+        yield return new WaitForSeconds(hintDelay);
         ShowHint();
+        instance.hinting = null;
     }
 }

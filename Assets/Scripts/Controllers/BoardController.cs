@@ -116,7 +116,6 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     // Check if Swap results in a Match
     public static void TryMatch(GemBase from, GemBase to) {
-        HintController.StopHinting();
         instance.StartCoroutine(instance.IETryMatch(from, to));
     }
 
@@ -138,6 +137,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             HintController.StartHinting();
             TouchController.cancel = false;
         } else {
+            HintController.StopCurrentHint();
+
             List<MatchInfo> matches = new List<MatchInfo>();
             List<Vector2Int> fallPositions = new List<Vector2Int>();
             
