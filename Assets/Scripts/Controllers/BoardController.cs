@@ -385,6 +385,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
             GameController.score += matchInfo.GetScore();
         }
+        UIController.ShowMsg("Match!!!");
         SoundController.PlaySfx(GameData.GetAudioClip("match"));
         yield return new WaitForSeconds(maxDuration/2);
     }

@@ -34,3 +34,12 @@ MonoBehaviour:
   - type: 6
     sprite: {fileID: 21300000, guid: b165480f1284456469c068e6cb5fc650, type: 3}
     minMatch: 3
+  audioClipInfos:
+  - name: bgm
+    clip: {fileID: 8300000, guid: f54f914e1258c5f4e90a9226d10af526, type: 3}
+  - name: click
+    clip: {fileID: 8300000, guid: 5db760126814a344da074153bc99dbf3, type: 3}
+  - name: swap
+    clip: {fileID: 8300000, guid: 2d829c1174379ab48a80f4d313ea7b00, type: 3}
+  - name: match
+    clip: {fileID: 8300000, guid: fd86baf1f32a4b6479125a722484681a, type: 3}

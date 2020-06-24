@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7549236201556414928}
   - component: {fileID: 7549236201556414931}
   m_Layer: 5
-  m_Name: Button
+  m_Name: button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -246,7 +246,7 @@ MonoBehaviour:
 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5acc9473def56704cb8e1a5c8696e2b2, type: 2}
-  m_sharedMaterial: {fileID: 1267998753751350830, guid: 5acc9473def56704cb8e1a5c8696e2b2,
+  m_sharedMaterial: {fileID: -8165781105005610761, guid: 5acc9473def56704cb8e1a5c8696e2b2,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

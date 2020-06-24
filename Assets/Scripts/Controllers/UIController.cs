@@ -25,6 +25,8 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     TextMeshProUGUI timeLeftText;
     [SerializeField]
     TextMeshProUGUI highscoreText;
+    [SerializeField]
+    TextMeshProUGUI msgText;
 
     CanvasGroup currentScreen;
 
@@ -75,6 +77,11 @@ public class UIController : SingletonMonoBehaviour<UIController> {
         
         System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(timeLeft);
         instance.timeLeftText.text = $"{ timeSpan.Minutes.ToString("D2") }:{ timeSpan.Seconds.ToString("D2") }";
+    }
+
+    public static void ShowMsg(string msg) {
+        instance.msgText.text = $"{ msg }";
+        instance.msgText.transform.GetComponent<Animator>().SetTrigger("pulse");
     }
 
     IEnumerator IEChangeScreen(CanvasGroup screen, System.Action executeBefore = null, System.Action executeAfter = null) {
