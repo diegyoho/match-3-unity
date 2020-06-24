@@ -44,7 +44,9 @@ public class GameData : SingletonScriptableObject<GameData> {
     }
 
     public static AudioClip GetAudioClip(string name) {
-        AudioClipInfo audioClipInfo = instance.audioClipInfos.Find(aci => aci.name == name);
+        AudioClipInfo audioClipInfo = instance.audioClipInfos.Find(
+            aci => aci.name == name
+        );
 
         if(audioClipInfo != null)
             return audioClipInfo.clip;

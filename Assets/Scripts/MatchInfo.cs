@@ -134,7 +134,9 @@ public class MatchInfo {
         return fallPositions;
     }
 
-    public static List<Vector2Int> JoinFallPositions(List<Vector2Int> matchA, List<Vector2Int> matchB) {
+    public static List<Vector2Int> JoinFallPositions(
+        List<Vector2Int> matchA, List<Vector2Int> matchB
+    ) {
         List<Vector2Int> fallPositions = new List<Vector2Int>();
 
         if(matchA.Count == 0)

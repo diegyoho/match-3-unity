@@ -8,7 +8,11 @@
         [MenuItem("Edit/Player Prefs")]
         public static void openWindow() {
      
-            PlayerPrefsEditor window = (PlayerPrefsEditor)EditorWindow.GetWindow(typeof(PlayerPrefsEditor));
+            PlayerPrefsEditor window = (PlayerPrefsEditor) 
+                                        EditorWindow.GetWindow(
+                                            typeof(PlayerPrefsEditor)
+                                        );
+
             window.titleContent = new GUIContent("Player Prefs");
             window.Show();
      
@@ -23,11 +27,13 @@
      
         void OnGUI() {
      
-            EditorGUILayout.LabelField("Player Prefs Editor", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(
+                "Player Prefs Editor", EditorStyles.boldLabel
+            );
             EditorGUILayout.LabelField("by RomejanicDev");
             EditorGUILayout.Separator();
      
-            fieldType = (FieldType)EditorGUILayout.EnumPopup("Key Type", fieldType);
+            fieldType = (FieldType) EditorGUILayout.EnumPopup("Key Type", fieldType);
             setKey = EditorGUILayout.TextField("Key to Set", setKey);
             setVal = EditorGUILayout.TextField("Value to Set", setVal);
      

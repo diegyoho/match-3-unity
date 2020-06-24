@@ -6,9 +6,24 @@ using UnityEngine.Events;
 namespace Utilities {
 	public static class Miscellaneous {
 		// Cooodernadas Horizontal e Vetical, 0:y, 1:x
-		public static int[, ] coord4 = new int[, ] { { 0, 1 }, {-1, 0 }, { 0, -1 }, { 1, 0 } };
+		public static int[, ] coord4 = new int[, ] {
+			{  0,  1 },
+			{ -1,  0 },
+			{  0, -1 },
+			{  1,  0 }
+		};
+
 		// Cooodernadas Horizontal e Vetical + Diagonais, 0:y, 1:x
-		public static int[, ] coord8 = new int[, ] { { 0, 1 }, {-1, 1 }, {-1, 0 }, {-1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
+		public static int[, ] coord8 = new int[, ] {
+			 {  0,  1 },
+			 { -1,  1 },
+			 { -1,  0 },
+			 { -1, -1 },
+			 {  0, -1 },
+			 {  1, -1 },
+			 {  1,  0 },
+			 {  1,  1 } 
+		};
 
 		// Preenche um Vetor com um valor definido
 		public static void Populate<T>(this T[] arr, T value) {
@@ -27,7 +42,9 @@ namespace Utilities {
 		}
 
 		// Preenche uma Área da Matriz com um valor definido
-		public static void PopulateArea<T>(this T[, ] arr, T value, int x, int y, int xLength, int yLength) {
+		public static void PopulateArea<T>(
+			this T[, ] arr, T value, int x, int y, int xLength, int yLength
+		) {
 			for (int j = y; j < y + yLength; ++j) {
 				for (int i = x; i < x + xLength; ++i) {
 					arr[j, i] = value;
@@ -69,27 +86,50 @@ namespace Utilities {
 		}
 
 		// StartCoroutine (InvokeRealtimeCoroutine (DoSomething, seconds));
-		public static IEnumerator InvokeRealtimeCoroutine(UnityAction action, float seconds) {
+		public static IEnumerator InvokeRealtimeCoroutine(
+			UnityAction action, float seconds
+		) {
 			yield return new WaitForSecondsRealtime(seconds);
 			if (action != null)
 				action();
 		}
 
-		public static Vector3 WorldPositionToCanvas(Vector3 position, RectTransform canvas, Camera camera) {
+		public static Vector3 WorldPositionToCanvas(
+			Vector3 position, RectTransform canvas, Camera camera
+		) {
 			Vector3 viewport = camera.WorldToViewportPoint(position);
-			return new Vector3(viewport.x * canvas.sizeDelta.x, viewport.y * canvas.sizeDelta.y);
+			return new Vector3(
+				viewport.x * canvas.sizeDelta.x,
+				viewport.y * canvas.sizeDelta.y
+			);
 		}
 
-		public static void SetCameraOrthographicSizeByWidth(Camera camera, float width) {
+		public static void SetCameraOrthographicSizeByWidth(
+			Camera camera, float width
+		) {
 			camera.orthographicSize = (width / camera.aspect) / 2;
 		}
 
-		public static Vector3 ClampPositionToCameraLimits(Camera camera, Vector3 position, float wOffset = 0, float hOffset = 0) {
+		public static Vector3 ClampPositionToCameraLimits(
+			Camera camera, Vector3 position, float wOffset = 0, float hOffset = 0
+		) {
 			float halfCameraWidth = HalfWidthCamera(camera);
-			return new Vector3(Mathf.Clamp(position.x, -(halfCameraWidth - wOffset), halfCameraWidth - wOffset), Mathf.Clamp(position.y, -(camera.orthographicSize - hOffset), camera.orthographicSize - hOffset));
+			return new Vector3(Mathf.Clamp(
+				position.x,
+				-(halfCameraWidth - wOffset),
+				halfCameraWidth - wOffset),
+				Mathf.Clamp(
+					position.y,
+					-(camera.orthographicSize - hOffset),
+					camera.orthographicSize - hOffset
+				)
+			);
 		}
 
-		public static bool CheckScreenBoundaries(Camera camera, Vector3 position, float wOffset = 0, float hOffset = 0) {
+		public static bool CheckScreenBoundaries(
+			Camera camera, Vector3 position,
+			float wOffset = 0, float hOffset = 0
+		) {
 			float halfhalfCameraWidth = HalfWidthCamera(camera);
 			return !(position.x < -(halfhalfCameraWidth + wOffset)
 				|| position.x > halfhalfCameraWidth + wOffset
@@ -124,14 +164,23 @@ namespace Utilities {
 		public static Color ColorHEX(string hex) {
 			if (hex.Length != 6) return Color.black;
 
-			int r = int.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
-			int g = int.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-			int b = int.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+			int r = int.Parse(hex.Substring(0, 2),
+							System.Globalization.NumberStyles.HexNumber);
+			int g = int.Parse(hex.Substring(2, 2),
+							System.Globalization.NumberStyles.HexNumber);
+			int b = int.Parse(hex.Substring(4, 2),
+							System.Globalization.NumberStyles.HexNumber);
+
 			return new Color(r / 255f, g / 255f, b / 255f);
 		}
 
-		public static float Map(float value, float fromMin, float fromMax, float toMin, float toMax) {
-			return Mathf.Lerp(toMin, toMax, Mathf.InverseLerp(fromMin, fromMax, value));
+		public static float Map(
+			float value, float fromMin,
+			float fromMax, float toMin, float toMax
+		) {
+			return Mathf.Lerp(
+				toMin, toMax, Mathf.InverseLerp(fromMin, fromMax, value)
+			);
 		}
 
 		public static List<T> RandomizeOrder<T>(List<T> list) {
@@ -167,11 +216,25 @@ namespace Utilities {
 			return (x % m + m) % m;
 		}
 
-		public static T[] FindComponentsInChildrenWithTag<T>(this GameObject parent, string tag, bool forceActive = false) where T : Component {
-			if (parent == null) { throw new System.ArgumentNullException(); }
-			if (string.IsNullOrEmpty(tag) == true) { throw new System.ArgumentNullException(); }
-			List<T> list = new List<T>(parent.GetComponentsInChildren<T>(forceActive));
-			if (list.Count == 0) { return null; }
+		public static T[] FindComponentsInChildrenWithTag<T>(
+			this GameObject parent, string tag, bool forceActive = false
+		) where T : Component {
+
+			if (parent == null) {
+				throw new System.ArgumentNullException();
+			}
+			
+			if (string.IsNullOrEmpty(tag) == true) {
+				throw new System.ArgumentNullException();
+			}
+
+			List<T> list = new List<T>(
+				parent.GetComponentsInChildren<T>(forceActive)
+			);
+			
+			if (list.Count == 0) {
+				return null;
+			}
 
 			for (int i = list.Count - 1; i >= 0; i--) {
 				if (list[i].CompareTag(tag) == false) {
@@ -181,7 +244,10 @@ namespace Utilities {
 			return list.ToArray();
 		}
 
-		public static T FindComponentInChildWithTag<T>(this GameObject parent, string tag) where T : Component {
+		public static T FindComponentInChildWithTag<T>(
+			this GameObject parent, string tag
+		) where T : Component {
+
 			Transform t = parent.transform;
 			foreach (Transform tr in t) {
 				if (tr.tag == tag) {
@@ -192,6 +258,22 @@ namespace Utilities {
 		}
 	}
 
-	public enum Directions { None = -1, Right, Down, Left, Up };
- public enum Directions8 { None = -1, Right, RightDown, Down, LeftDown, Left, LeftUp, Up, RightUp };
+	public enum Directions {
+		None = -1,
+		Right,
+		Down,
+		Left,
+		Up 
+	};
+	public enum Directions8 {
+		None = -1,
+		Right,
+		RightDown,
+		Down,
+		LeftDown,
+		Left,
+		LeftUp,
+		Up,
+		RightUp 
+	};
 }

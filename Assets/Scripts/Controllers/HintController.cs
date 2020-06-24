@@ -89,9 +89,14 @@ public class HintController : SingletonMonoBehaviour<HintController> {
 
     public static void ShowHint() {
         if(hasHints && !isShowing) {
-            HintInfo hintInfo = instance.hints[Random.Range(0, instance.hints.Count)];
+            HintInfo hintInfo = instance.hints[
+                Random.Range(0, instance.hints.Count)
+            ];
             hintInfo.gem.Hint();
-            hintInfo.currentSwap = hintInfo.swaps[Random.Range(0, hintInfo.swaps.Count)];
+
+            hintInfo.currentSwap = hintInfo.swaps[
+                Random.Range(0, hintInfo.swaps.Count)
+            ];
             hintInfo.currentSwap.Hint();
             instance.currentHint = hintInfo;
         }
@@ -107,7 +112,9 @@ public class HintController : SingletonMonoBehaviour<HintController> {
 
     public static void StartHinting() {
         if(instance.hinting == null && !isShowing)
-            instance.hinting = instance.StartCoroutine(instance.IEStartHinting());
+            instance.hinting = instance.StartCoroutine(
+                instance.IEStartHinting()
+            );
     }
 
     public static void StopHinting() {

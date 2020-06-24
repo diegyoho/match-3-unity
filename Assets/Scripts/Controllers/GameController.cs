@@ -32,7 +32,9 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     public static int score {
         get { return instance._score; }
         set {
-            UIController.UpdateComboScore(value - instance._score, BoardController.matchCounter);
+            UIController.UpdateComboScore(
+                value - instance._score, BoardController.matchCounter
+            );
             instance._score = value;
             UIController.UpdateScore(instance._score);
 
@@ -78,7 +80,9 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         
         Miscellaneous.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
         float bgHeight = bg.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
-        bg.transform.localScale = Vector3.one * (Camera.main.orthographicSize * 2 / bgHeight);
+        bg.transform.localScale = Vector3.one * (
+            Camera.main.orthographicSize * 2 / bgHeight
+        );
 
         gemMenu.transform.localScale = Vector3.one * 2 * (cameraWidth / 7f);
         gem = gemMenu.GetComponentInChildren<GemBase>();

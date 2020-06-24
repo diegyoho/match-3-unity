@@ -47,7 +47,9 @@ public class GemBase : MonoBehaviour, ITouchable {
         float distance = (target - transform.position).magnitude;
 
         while(!Mathf.Approximately(0.0f, distance)) {
-            transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(
+                transform.position, target, speed * Time.deltaTime
+            );
             yield return null;
             distance = (target - transform.position).magnitude;
         }
@@ -72,9 +74,13 @@ public class GemBase : MonoBehaviour, ITouchable {
     }
 
     public void TouchDrag() {
-        if(Vector2.Distance(transform.position, TouchController.touchPosition) > 0.75f) {
+        if(Vector2.Distance(
+            transform.position, TouchController.touchPosition
+        ) > 0.75f) {
 
-            Vector2 delta = TouchController.touchPosition - transform.position;
+            Vector2 delta = TouchController.touchPosition -
+                            transform.position;
+
             GemBase otherGem;
 
             if(Mathf.Abs(delta.x) > Mathf.Abs(delta.y)) {

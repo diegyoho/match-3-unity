@@ -70,7 +70,10 @@ public class SoundController : SingletonMonoBehaviour<SoundController> {
     }
 
     public static AudioSource PlaySfxInstance(AudioClip clip, float volume = 1f) {
-        AudioSource sfxSource = Instantiate(Resources.Load<GameObject>("sfxSourcePrefab")).GetComponent<AudioSource>();
+        AudioSource sfxSource = Instantiate(
+            Resources.Load<GameObject>("sfxSourcePrefab")
+        ).GetComponent<AudioSource>();
+        
         sfxSource.mute = soundMuted;
         sfxSource.clip = clip;
         sfxSource.volume = volume;

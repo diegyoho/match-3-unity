@@ -40,9 +40,11 @@ public class UIController : SingletonMonoBehaviour<UIController> {
 
     public static void ShowMainScreen() {
         UpdateHighScore(GameController.highscore);
-        instance.StartCoroutine(instance.IEChangeScreen(instance.mainScreen, executeAfter: () => {
-            GameController.ShowGemMenu();
-        }));
+        instance.StartCoroutine(
+            instance.IEChangeScreen(instance.mainScreen, executeAfter: () => {
+                GameController.ShowGemMenu();
+            })
+        );
     }
 
     public static void ShowGameScreen() {
@@ -50,19 +52,23 @@ public class UIController : SingletonMonoBehaviour<UIController> {
         UpdateScore(GameController.score);
         UpdateGoalScore(GameController.currentGoalScore);
         UpdateTimeLeft(GameController.timeLeft);
-        instance.StartCoroutine(instance.IEChangeScreen(instance.gameScreen, () => {
-            GameController.ShowGemMenu(false);
-        }));
+        instance.StartCoroutine(
+            instance.IEChangeScreen(instance.gameScreen, () => {
+                GameController.ShowGemMenu(false);
+            })
+        );
     }
 
     public static void UpdateScore(int score) {
         instance.scoreText.text = $"{ score }";
-        instance.scoreText.transform.parent.GetComponent<Animator>().SetTrigger("pulse");
+        instance.scoreText.transform.parent
+            .GetComponent<Animator>().SetTrigger("pulse");
     }
 
     public static void UpdateComboScore(int comboScore, int multiplier) {
         instance.comboScoreText.text = $"+{ comboScore }";
-        instance.comboMultiplierText.text = (multiplier > 1 ? $" x{ multiplier }" : "");
+        instance.comboMultiplierText.text = multiplier > 1 ? $" x{ multiplier }" : "";
+
         instance.comboScoreText.GetComponent<Animator>().SetTrigger("pulse");
     }
 
@@ -88,7 +94,9 @@ public class UIController : SingletonMonoBehaviour<UIController> {
         }
         
         System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(timeLeft);
-        instance.timeLeftText.text = $"{ timeSpan.Minutes.ToString("D2") }:{ timeSpan.Seconds.ToString("D2") }";
+        string mm = timeSpan.Minutes.ToString("D2");
+        string ss = timeSpan.Seconds.ToString("D2");
+        instance.timeLeftText.text = $"{ mm }:{ ss }";
     }
 
     public static void ShowMsg(string msg) {
@@ -96,7 +104,10 @@ public class UIController : SingletonMonoBehaviour<UIController> {
         instance.msgText.transform.GetComponent<Animator>().SetTrigger("pulse");
     }
 
-    IEnumerator IEChangeScreen(CanvasGroup screen, System.Action executeBefore = null, System.Action executeAfter = null) {
+    IEnumerator IEChangeScreen(
+        CanvasGroup screen,
+        System.Action executeBefore = null, System.Action executeAfter = null
+    ) {
         if(executeBefore != null)
             executeBefore();
 

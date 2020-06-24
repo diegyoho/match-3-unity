@@ -30,7 +30,9 @@ namespace Utilities {
             }
         }
 
-        public WaitForSecondsAndNotPaused(float seconds, System.Func<bool> isPaused) {
+        public WaitForSecondsAndNotPaused(
+            float seconds, System.Func<bool> isPaused
+        ) {
            this.seconds = seconds;
            this.isPaused = isPaused;
            initialTime = Time.time;

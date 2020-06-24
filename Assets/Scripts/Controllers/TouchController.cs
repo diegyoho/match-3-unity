@@ -27,8 +27,14 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 	void HandleInput() {
 		if (Input.touchCount == 1) {
 			Touch touch = Input.GetTouch(0);
-			touchPosition = (Vector2) Camera.main.ScreenToWorldPoint(touch.position);
-			RaycastHit2D raycastHit = Physics2D.Raycast(touchPosition, Vector3.forward, Mathf.Infinity);
+			touchPosition = (Vector2) Camera.main.ScreenToWorldPoint(
+				touch.position
+			);
+
+			RaycastHit2D raycastHit = Physics2D.Raycast(
+				touchPosition, Vector3.forward, Mathf.Infinity
+			);
+
 			if (elementClicked != null) {
 				switch (touch.phase) {
 					case TouchPhase.Moved:
@@ -41,7 +47,8 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 				}
 			} else if (touch.phase == TouchPhase.Began) {
 				if (raycastHit) {
-					elementClicked = raycastHit.collider.GetComponent<ITouchable>();
+					elementClicked = raycastHit.collider
+									.GetComponent<ITouchable>();
 				}
 				if (elementClicked != null)
 					elementClicked.TouchDown();
@@ -55,8 +62,12 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 	Vector3 lastPosition;
 	void HandleInputEditor() {
 		lastPosition = touchPosition;
-		touchPosition = (Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		RaycastHit2D raycastHit = Physics2D.Raycast(touchPosition, Vector3.forward, Mathf.Infinity);
+		touchPosition = (Vector2) Camera.main
+						.ScreenToWorldPoint(Input.mousePosition);
+
+		RaycastHit2D raycastHit = Physics2D.Raycast(
+			touchPosition, Vector3.forward, Mathf.Infinity
+		);
 
 		if (elementClicked != null) {
 			if (Input.GetMouseButton(0)) {
@@ -68,7 +79,8 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 			}
 		} else if (Input.GetMouseButtonDown(0)) {
 			if (raycastHit) {
-				elementClicked = raycastHit.collider.GetComponent<ITouchable>();
+				elementClicked = raycastHit.collider
+								.GetComponent<ITouchable>();
 			}
 
 			if (elementClicked != null)

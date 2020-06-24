@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utilities {
-	public class SingletonMonoBehaviour<T> : MonoBehaviour where T : Component {
+	public class SingletonMonoBehaviour<T> :
+		MonoBehaviour where T : Component {
 
 		static T _ins;
 

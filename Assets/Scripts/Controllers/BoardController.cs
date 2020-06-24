@@ -88,7 +88,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     GemBase CreateGem(int x, int y) {
         return CreateGem(
             x, y,
-            GetWorldPosition(new Vector2Int(x, height))// + Vector3.up * (Camera.main.orthographicSize + 1 + height/2)
+            GetWorldPosition(new Vector2Int(x, height))
         );
     }
 
@@ -113,8 +113,12 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     IEnumerator IESwapGems(GemBase from, GemBase to) {
 
-        float durationFrom = from.MoveTo(GetWorldPosition(to.position), GameController.instance.swapSpeed);
-        float durationTo = to.MoveTo(GetWorldPosition(from.position), GameController.instance.swapSpeed);
+        float durationFrom = from.MoveTo(
+            GetWorldPosition(to.position), GameController.instance.swapSpeed
+        );
+        float durationTo = to.MoveTo(
+            GetWorldPosition(from.position), GameController.instance.swapSpeed
+        );
 
         yield return new WaitForSeconds(Mathf.Max(durationFrom, durationTo));
 
@@ -153,12 +157,16 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             
             if(matchFrom.isValid) {
                 matches.Add(matchFrom);
-                fallPositions = MatchInfo.JoinFallPositions(fallPositions, matchFrom.GetFallPositions());
+                fallPositions = MatchInfo.JoinFallPositions(
+                    fallPositions, matchFrom.GetFallPositions()
+                );
             }
 
             if(matchTo.isValid) {
                 matches.Add(matchTo);
-                fallPositions = MatchInfo.JoinFallPositions(fallPositions, matchTo.GetFallPositions());
+                fallPositions = MatchInfo.JoinFallPositions(
+                    fallPositions, matchTo.GetFallPositions()
+                );
             }
             
             yield return StartCoroutine(DestroyMatchedGems(matches));
@@ -202,9 +210,15 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             if(matchInfo.isValid) {
                 matchInfo.matches.ForEach( gem => gems.Remove(gem));
                 
-                MatchInfo matchInfoSameType = matchInfos.Find(mi => mi.pivot.type == matchInfo.pivot.type);
+                MatchInfo matchInfoSameType = matchInfos.Find(
+                    mi => mi.pivot.type == matchInfo.pivot.type
+                );
+
                 if(matchInfoSameType != null) {
-                    matchInfoSameType = MatchInfo.JoinCrossedMatches(matchInfoSameType, matchInfo);
+                    matchInfoSameType = MatchInfo.JoinCrossedMatches(
+                        matchInfoSameType, matchInfo
+                    );
+
                     if(matchInfoSameType.isValid) {
                         matchInfos.Add(matchInfoSameType);
                         continue;
@@ -221,7 +235,9 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             List<MatchInfo> matchesToDestroy = new List<MatchInfo>();
             foreach(MatchInfo matchInfo in matchInfos) {
                 matchesToDestroy.Add(matchInfo);
-                fallPositions = MatchInfo.JoinFallPositions(fallPositions, matchInfo.GetFallPositions());
+                fallPositions = MatchInfo.JoinFallPositions(
+                    fallPositions, matchInfo.GetFallPositions()
+                );
             }
 
             yield return StartCoroutine(DestroyMatchedGems(matchesToDestroy));
@@ -256,8 +272,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                 GemBase newGem = instance.CreateGem(
                     fall.x, y,
                     GetWorldPosition(new Vector2Int(
-                        fall.x, height//y - (height - fallY)
-                    )) // + Vector3.up * (Camera.main.orthographicSize + height/2)
+                        fall.x, height
+                    ))
                 );
                 
                 float duration = newGem.MoveTo(
