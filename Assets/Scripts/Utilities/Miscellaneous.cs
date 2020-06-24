@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace Utilities {
-	public static class MiscellaneousUtils {
+	public static class Miscellaneous {
 		// Cooodernadas Horizontal e Vetical, 0:y, 1:x
 		public static int[, ] coord4 = new int[, ] { { 0, 1 }, {-1, 0 }, { 0, -1 }, { 1, 0 } };
 		// Cooodernadas Horizontal e Vetical + Diagonais, 0:y, 1:x

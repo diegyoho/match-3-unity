@@ -3,15 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utilities;
 
-[System.Serializable]
-public class AudioClipInfo {
-    public string name;
-    public AudioClip clip;
-}
-
 public class SoundController : SingletonMonoBehaviour<SoundController> {
-
-    public List<AudioClipInfo> audioClipInfos = new List<AudioClipInfo>();
 
     AudioSource musicSource,
     sfxSource;
@@ -24,12 +16,6 @@ public class SoundController : SingletonMonoBehaviour<SoundController> {
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.loop = true;
         sfxSource = gameObject.AddComponent<AudioSource>();
-    }
-
-    public static void PlayMusic(string name, float volume) {
-        AudioClip clip = instance.audioClipInfos.Find(aci => aci.name == name).clip;
-        if(clip != null)
-            PlayMusic(clip, volume);
     }
 
     public static void PlayMusic(AudioClip clip, float volume) {
@@ -69,12 +55,6 @@ public class SoundController : SingletonMonoBehaviour<SoundController> {
         musicSource.volume = volume;
     }
 
-    public static void PlaySfx(string name, float volume = 1f) {
-        AudioClip clip = instance.audioClipInfos.Find(aci => aci.name == name).clip;
-        if(clip != null)
-            PlaySfx(clip, volume);
-    }
-
     public static void PlaySfx(AudioClip clip, float volume = 1f) {
         instance.sfxSource.mute = soundMuted;
         instance.sfxSource.clip = clip;
@@ -82,25 +62,11 @@ public class SoundController : SingletonMonoBehaviour<SoundController> {
         instance.sfxSource.Play();
     }
 
-    public void PlaySfxNonStatic(string name) {
-        AudioClip clip = audioClipInfos.Find(aci => aci.name == name).clip;
-        if(clip != null)
-            PlaySfxNonStatic(clip);
-    }
-
     public void PlaySfxNonStatic(AudioClip clip) {
         instance.sfxSource.mute = soundMuted;
         instance.sfxSource.clip = clip;
         instance.sfxSource.volume = 1f;
         instance.sfxSource.Play();
-    }
-
-    public static AudioSource PlaySfxInstance(string name, float volume = 1f) {
-        AudioClip clip = instance.audioClipInfos.Find(aci => aci.name == name).clip;
-        if(clip != null)
-            return PlaySfxInstance(clip, volume);
-        
-        return null;
     }
 
     public static AudioSource PlaySfxInstance(AudioClip clip, float volume = 1f) {

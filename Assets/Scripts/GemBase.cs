@@ -89,7 +89,7 @@ public class GemBase : MonoBehaviour, ITouchable {
 
             if(otherGem) {
                 BoardController.TryMatch(this, otherGem);
-                SoundController.PlaySfx("swap");
+                SoundController.PlaySfx(GameData.GetAudioClip("swap"));
             }
 
             TouchUp();

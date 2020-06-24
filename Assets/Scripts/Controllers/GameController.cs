@@ -80,7 +80,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         if(autoCameraWidth)
             cameraWidth = BoardController.width + 1;
         
-        MiscellaneousUtils.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
+        Miscellaneous.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
         float bgHeight = bg.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
         bg.transform.localScale = Vector3.one * (Camera.main.orthographicSize * 2 / bgHeight);
 
@@ -89,7 +89,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
         UIController.ShowMainScreen();
         
-        SoundController.PlayMusic("bgm", 1);
+        SoundController.PlayMusic(GameData.GetAudioClip("bgm"), 1);
     }
 
     void Update() {
@@ -162,8 +162,8 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
     IEnumerator IEChangeGem() {
         gemMenu.gameObject.SetActive(true);
-        gem.SetType(gameData.RandomGem());
-        SoundController.PlaySfx("match");
+        gem.SetType(GameData.RandomGem());
+        SoundController.PlaySfx(GameData.GetAudioClip("match"));
         instance.gem.animator.SetTrigger("creating");
         yield return new WaitForSeconds(3);
 

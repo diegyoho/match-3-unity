@@ -11,7 +11,7 @@ public class Button : MonoBehaviour {
             buttonName.rectTransform.offsetMin.x, -20
         );
         
-        SoundController.PlaySfx("click");
+        SoundController.PlaySfx(GameData.GetAudioClip("click"));
     }
 
     public void Released() {

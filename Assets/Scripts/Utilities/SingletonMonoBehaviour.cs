@@ -1,21 +1,16 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utilities {
-	public class SingletonMonoBehaviour<T> : MonoBehaviour where T : Component {
-
-		static T _ins;
-
+	public abstract class SingletonScriptableObject<T> : ScriptableObject where T : ScriptableObject {
+		static T _instance = null;
 		public static T instance {
-			get { return _ins; }
-		}
-
-		public virtual void Awake() {
-			if (_ins == null) {
-				_ins = this as T;
-			} else {
-				Destroy(this);
+			get {
+				if (!_instance)
+					_instance = Resources.FindObjectsOfTypeAll<T>().FirstOrDefault();
+				return _instance;
 			}
 		}
 	}

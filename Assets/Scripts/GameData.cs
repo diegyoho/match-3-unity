@@ -20,11 +20,27 @@ public class GemData {
     public int minMatch = 3;
 }
 
-[CreateAssetMenu(fileName = "GameData", menuName = "Match3/GameData", order = 1)]
-public class GameData : ScriptableObject {
-    public List<GemData> gems = new List<GemData>();
+[System.Serializable]
+public class AudioClipInfo {
+    public string name;
+    public AudioClip clip;
+}
 
-    public GemData RandomGem() {
-        return MiscellaneousUtils.Choose(gems);
+[CreateAssetMenu(fileName = "GameData", menuName = "Match3/GameData", order = 1)]
+public class GameData : SingletonScriptableObject<GameData> {
+    public List<GemData> gems = new List<GemData>();
+    public List<AudioClipInfo> audioClipInfos = new List<AudioClipInfo>();
+
+    public static GemData RandomGem() {
+        return Miscellaneous.Choose(instance.gems);
+    }
+
+    public static AudioClip GetAudioClip(string name) {
+        AudioClipInfo audioClipInfo = instance.audioClipInfos.Find(aci => aci.name == name);
+
+        if(audioClipInfo != null)
+            return audioClipInfo.clip;
+
+        return null;
     }
 }

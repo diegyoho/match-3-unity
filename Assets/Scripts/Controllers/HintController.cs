@@ -29,6 +29,8 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     public static bool isShowing {
         get { return instance.currentHint != null; }
     }
+
+    public static bool paused;
     
     HintInfo GetHint(GemBase gem, GemBase otherGem) {
         if(!(gem && otherGem))
@@ -73,7 +75,7 @@ public class HintController : SingletonMonoBehaviour<HintController> {
                         instance.hints.Add(hintInfo);
                 }
 
-                // Swap Right
+                // Swap Up
                 otherGem = BoardController.GetGem(i, j + 1);
                 if(otherGem && otherGem.type != gem.type) {
                     HintInfo hintInfo = instance.GetHint(gem, otherGem);
@@ -86,19 +88,17 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     }
 
     public static void ShowHint() {
-        if(hasHints) {
+        if(hasHints && !isShowing) {
             HintInfo hintInfo = instance.hints[Random.Range(0, instance.hints.Count)];
             hintInfo.gem.Hint();
             hintInfo.currentSwap = hintInfo.swaps[Random.Range(0, hintInfo.swaps.Count)];
             hintInfo.currentSwap.Hint();
             instance.currentHint = hintInfo;
-        } else {
-            instance.currentHint = null;
         }
     }
 
     public static void StopCurrentHint() {
-        if(instance.currentHint != null) {
+        if(isShowing) {
             instance.currentHint.gem.Hint(false);
             instance.currentHint.currentSwap.Hint(false);
             instance.currentHint = null;
@@ -106,7 +106,7 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     }
 
     public static void StartHinting() {
-        if(instance.hinting == null)
+        if(instance.hinting == null && !isShowing)
             instance.hinting = instance.StartCoroutine(instance.IEStartHinting());
     }
 
@@ -118,11 +118,10 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     }
 
     IEnumerator IEStartHinting() {
-        
-        if(currentHint != null)
-            yield break;
 
-        yield return new WaitForSeconds(hintDelay);
+        paused = false;
+        yield return new WaitForSecondsAndNotPaused(hintDelay, () => paused);
+
         ShowHint();
         instance.hinting = null;
     }

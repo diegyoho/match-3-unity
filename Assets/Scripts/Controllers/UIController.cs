@@ -67,13 +67,14 @@ public class UIController : SingletonMonoBehaviour<UIController> {
             if(Time.time - instance.timePulse > 1f) {
                 instance.timeLeftText.GetComponent<Animator>().SetTrigger("pulse");
                 instance.timePulse = Time.time;
-                SoundController.PlaySfx("click");
+                SoundController.PlaySfx(GameData.GetAudioClip("click"));
             }
         } else {
             instance.timePulse = 0;
         }
+        
         System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(timeLeft);
-        instance.timeLeftText.text = string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
+        instance.timeLeftText.text = $"{ timeSpan.Minutes.ToString("D2") }:{ timeSpan.Seconds.ToString("D2") }";
     }
 
     IEnumerator IEChangeScreen(CanvasGroup screen, System.Action executeBefore = null, System.Action executeAfter = null) {

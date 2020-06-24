@@ -48,7 +48,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
                 if(GameController.instance.preventInitialMatches)
                     while(GetCrossMatch(gem).isValid) {
-                        gem.SetType(GameController.gameData.RandomGem());
+                        gem.SetType(GameData.RandomGem());
                     }
 
                 float duration = gem.MoveTo(
@@ -73,7 +73,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         ).GetComponent<GemBase>();
 
         gem.SetPosition(new Vector2Int(x, y));
-        gem.SetType(GameController.gameData.RandomGem());
+        gem.SetType(GameData.RandomGem());
         return gem;
     }
 
@@ -121,6 +121,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     IEnumerator IETryMatch(GemBase from, GemBase to) {
         TouchController.cancel = true;
+        HintController.paused = true;
         yield return StartCoroutine(IESwapGems(from, to));
         
         if(from.type == to.type) {
@@ -134,10 +135,11 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
         if(!(matchFrom.isValid || matchTo.isValid)) {
             yield return StartCoroutine(IESwapGems(from, to));
-            HintController.StartHinting();
+            HintController.paused = false;
             TouchController.cancel = false;
         } else {
             HintController.StopCurrentHint();
+            HintController.StopHinting();
 
             List<MatchInfo> matches = new List<MatchInfo>();
             List<Vector2Int> fallPositions = new List<Vector2Int>();
@@ -349,7 +351,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     public IEnumerator ShuffleBoard() {
         yield return new WaitForSeconds(.25f);
-        gemBoard = MiscellaneousUtils.ShuffleMatrix(gemBoard);
+        gemBoard = Miscellaneous.ShuffleMatrix(gemBoard);
         float maxDuration = 0;
         for(int j = 0; j < height; ++j) {
             for(int i = 0; i < width; ++i) {
@@ -383,7 +385,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
             GameController.score += matchInfo.GetScore();
         }
-        SoundController.PlaySfx("match");
+        SoundController.PlaySfx(GameData.GetAudioClip("match"));
         yield return new WaitForSeconds(maxDuration/2);
     }
 
