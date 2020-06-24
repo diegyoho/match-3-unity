@@ -10,11 +10,14 @@ public enum GameState {
 
 public class GameController : SingletonMonoBehaviour<GameController> {
 
+    Coroutine changeGem;
+
     [Header("Camera Settings")]
     public float cameraWidth = 7;
     public bool autoCameraWidth;
     public GameObject bg;
     public GameObject gemMenu;
+    GemBase gem;
 
 
     [Header("Game Settings")]
@@ -71,6 +74,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         bg.transform.localScale = Vector3.one * (Camera.main.orthographicSize * 2 / bgHeight);
 
         gemMenu.transform.localScale = Vector3.one * 2 * (cameraWidth / 7f);
+        gem = gemMenu.GetComponentInChildren<GemBase>();
 
         UIController.ShowMainScreen();
         
@@ -132,5 +136,29 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         HintController.StopHinting();
         yield return new WaitForSeconds(BoardController.DestroyGems() + .5f);
         UIController.ShowMainScreen();
+    }
+
+    public static void ShowGemMenu(bool show = true) {
+        if(show) {
+            instance.changeGem = instance.StartCoroutine(instance.IEChangeGem());
+        } else {
+            instance.gem.animator.SetTrigger("matched");
+            if(instance.changeGem != null) {
+                instance.StopCoroutine(instance.changeGem);
+                instance.changeGem = null;            }
+        }
+    }
+
+    IEnumerator IEChangeGem() {
+        gemMenu.gameObject.SetActive(true);
+        gem.SetType(gameData.RandomGem());
+        SoundController.PlaySfx("match");
+        instance.gem.animator.SetTrigger("creating");
+        yield return new WaitForSeconds(3);
+
+        gem.animator.SetTrigger("matched");
+        yield return new WaitForSeconds(.5f);
+        
+        changeGem = StartCoroutine(IEChangeGem());
     }
 }

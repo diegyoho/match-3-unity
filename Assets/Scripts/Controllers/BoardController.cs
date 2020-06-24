@@ -396,7 +396,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         foreach(GemBase gem in matches) {
             gemBoard[gem.position.x, gem.position.y] = null;
             float duration = gem.Matched();
-
+            Destroy(gem.gameObject, duration);
             if(duration > maxDuration)
                 maxDuration = duration;
         }
