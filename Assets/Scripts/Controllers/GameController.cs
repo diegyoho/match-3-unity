@@ -126,10 +126,10 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         score = 0;
         currentGoalScore = 50;
         timeLeft = 120;
+        BoardController.matchCounter = 0;
         UIController.ShowGameScreen();
         yield return new WaitForSeconds(1f);
 
-        
         TouchController.cancel = true;
         yield return new WaitForSeconds(BoardController.CreateBoard());
         state = GameState.Playing;
@@ -141,10 +141,17 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     }
 
     IEnumerator IEGameOver() {
+
+        yield return new WaitUntil(() => !BoardController.updatingBoard);
+
+        if(timeLeft > 0)
+            yield break;
+
         TouchController.cancel = true;
         state = GameState.Menu;
         HintController.StopCurrentHint();
         HintController.StopHinting();
+        UIController.ShowMsg("Game Over");
         yield return new WaitForSeconds(BoardController.DestroyGems() + .5f);
         UIController.ShowMainScreen();
     }

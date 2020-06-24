@@ -66,7 +66,7 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     }
 
     public static void UpdateComboScore(int comboScore, int multiplier) {
-        instance.comboScoreText.text = $"+{ comboScore }";
+        instance.comboScoreText.text = $"+{ comboScore / Mathf.Max(multiplier, 1) }";
         instance.comboMultiplierText.text = multiplier > 1 ? $" x{ multiplier }" : "";
 
         instance.comboScoreText.GetComponent<Animator>().SetTrigger("pulse");
@@ -87,7 +87,7 @@ public class UIController : SingletonMonoBehaviour<UIController> {
             if(Time.time - instance.timePulse > 1f) {
                 instance.timeLeftText.GetComponent<Animator>().SetTrigger("pulse");
                 instance.timePulse = Time.time;
-                SoundController.PlaySfx(GameData.GetAudioClip("click"));
+                SoundController.PlaySfxInstance(GameData.GetAudioClip("click"));
             }
         } else {
             instance.timePulse = 0;

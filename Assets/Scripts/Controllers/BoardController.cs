@@ -34,6 +34,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     [Header("Gem Base Prefab")]
     public GameObject gemPrefab;
 
+    public static bool updatingBoard;
+
     // Calculate Board Position into World
     public static Vector3 GetWorldPosition(Vector2Int position) {
         return new Vector2(
@@ -131,13 +133,12 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     IEnumerator IETryMatch(GemBase from, GemBase to) {
-        TouchController.cancel = true;
-        HintController.paused = true;
+        EnableUpdateBoard(true);
         yield return StartCoroutine(IESwapGems(from, to));
         
         if(from.type == to.type) {
             yield return StartCoroutine(IESwapGems(from, to));
-            TouchController.cancel = false;
+            EnableUpdateBoard(false);
             yield break;
         }
 
@@ -146,8 +147,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
         if(!(matchFrom.isValid || matchTo.isValid)) {
             yield return StartCoroutine(IESwapGems(from, to));
-            HintController.paused = false;
-            TouchController.cancel = false;
+            EnableUpdateBoard(false);
         } else {
             HintController.StopCurrentHint();
             HintController.StopHinting();
@@ -184,17 +184,30 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     IEnumerator IEUpdateBoard() {
-        TouchController.cancel = true;
+        EnableUpdateBoard(true);
+
         yield return StartCoroutine(FindChainMatches());
+
+        if(GameController.timeLeft <= 0) {
+            EnableUpdateBoard(false);
+            yield break;
+        }
+
         HintController.FindHints();
         if(!HintController.hasHints) {
             yield return StartCoroutine(ShuffleBoard());
             UpdateBoard();
         } else {
-            HintController.StartHinting();
+            EnableUpdateBoard(false);
             matchCounter = 0;
-            TouchController.cancel = false;
+            HintController.StartHinting();
         }
+    }
+
+    static void EnableUpdateBoard(bool enable) {
+        updatingBoard = enable;
+        HintController.paused = enable;
+        TouchController.cancel = enable;
     }
 
     // Check for matches in all Board
@@ -398,7 +411,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
     IEnumerator DestroyMatchedGems(List<MatchInfo> matches) {
         float maxDuration = 0;
-
+        int score = 0;
         foreach(MatchInfo matchInfo in matches) {
             foreach(GemBase gem in matchInfo.matches) {
                 float duration = DestroyGems(matchInfo.matches);
@@ -407,8 +420,9 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                     maxDuration = duration;
             }
             matchCounter++;
-            GameController.score += matchInfo.GetScore() * matchCounter;
+            score += matchInfo.GetScore();
         }
+        GameController.score += score * matchCounter;
         UIController.ShowMsg($"{ GameData.GetComboMessage(matchCounter - 1) }");
         SoundController.PlaySfx(GameData.GetAudioClip("match"));
         yield return new WaitForSeconds(maxDuration/2);
