@@ -36,7 +36,7 @@ namespace Utilities {
 		}
 
 		// Retorna uma Lista de uma Matriz
-		public static List<T> GetList<T>(T[, ] arr) {
+		public static List<T> GetList<T>(this T[, ] arr) {
 
 			List<T> list = new List<T>();
 

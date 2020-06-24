@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utilities;
 
+public enum GameState {
+    Menu,
+    Playing
+}
+
 public class GameController : SingletonMonoBehaviour<GameController> {
 
     [Header("Camera Settings")]
     public float cameraWidth = 7;
     public bool autoCameraWidth;
     public GameObject bg;
+    public GameObject gemMenu;
 
 
     [Header("Game Settings")]
-    
     [SerializeField]
     GameData _gameData;
     public static GameData gameData {
@@ -34,6 +39,29 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         }
     }
 
+    [SerializeField]
+    int _currentGoalScore;
+
+    public static int currentGoalScore {
+        get { return instance._currentGoalScore; }
+        set {
+            instance._currentGoalScore = value;
+            UIController.UpdateGoalScore(instance._currentGoalScore);
+        }
+    }
+
+    [SerializeField]
+    float _timeLeft;
+    public static float timeLeft {
+        get { return instance._timeLeft; }
+        set {
+            instance._timeLeft = Mathf.Max(value, 0);
+            UIController.UpdateTimeLeft(instance._timeLeft);
+        }
+    }
+
+    public static GameState state = GameState.Menu;
+
     void Start() {
         if(autoCameraWidth)
             cameraWidth = BoardController.width + 1;
@@ -42,11 +70,24 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         float bgHeight = bg.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
         bg.transform.localScale = Vector3.one * (Camera.main.orthographicSize * 2 / bgHeight);
 
+        gemMenu.transform.localScale = Vector3.one * 2 * (cameraWidth / 7f);
+
         UIController.ShowMainScreen();
         
     }
 
     void Update() {
+        if(state == GameState.Playing) {
+            timeLeft -= Time.deltaTime;
+            if(score >= currentGoalScore) {
+                currentGoalScore += currentGoalScore + currentGoalScore/2;
+                timeLeft = 120;
+            }
+
+            if(timeLeft <= 0) {
+                GameOver();
+            }
+        }
     #if UNITY_EDITOR
         if(Input.GetKeyDown(KeyCode.Space)) {
             StartCoroutine(BoardController.instance.ShuffleBoard());
@@ -66,10 +107,27 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     }
 
     IEnumerator IEStartGame() {
-
+        score = 0;
+        currentGoalScore = 50;
+        timeLeft = 120;
         UIController.ShowGameScreen();
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
 
-        BoardController.CreateBoard();
+        
+        TouchController.cancel = true;
+        yield return new WaitForSeconds(BoardController.CreateBoard());
+        state = GameState.Playing;
+        BoardController.UpdateBoard();
+    }
+
+    void GameOver() {
+        StartCoroutine(IEGameOver());
+    }
+
+    IEnumerator IEGameOver() {
+        TouchController.cancel = true;
+        state = GameState.Menu;
+        yield return new WaitForSeconds(BoardController.DestroyGems() + .5f);
+        UIController.ShowMainScreen();
     }
 }

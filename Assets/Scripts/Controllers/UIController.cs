@@ -19,6 +19,11 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     [SerializeField]
     TextMeshProUGUI scoreText;
 
+    [SerializeField]
+    TextMeshProUGUI goalScoreText;
+    [SerializeField]
+    TextMeshProUGUI timeLeftText;
+
     CanvasGroup currentScreen;
 
     public static void ShowMainScreen() {
@@ -28,11 +33,22 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     public static void ShowGameScreen() {
         
         UpdateScore(GameController.score);
+        UpdateGoalScore(GameController.currentGoalScore);
+        UpdateTimeLeft(GameController.timeLeft);
         instance.StartCoroutine(instance.IEChangeScreen(instance.gameScreen));
     }
 
     public static void UpdateScore(int score) {
-        instance.scoreText.text = $"Score: { score }";
+        instance.scoreText.text = $"{ score }";
+    }
+
+    public static void UpdateGoalScore(int goalScore) {
+        instance.goalScoreText.text = $"/{ goalScore }";
+    }
+
+    public static void UpdateTimeLeft(float timeLeft) {
+        System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(timeLeft);
+        instance.timeLeftText.text = string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
     }
 
     IEnumerator IEChangeScreen(CanvasGroup screen) {

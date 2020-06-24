@@ -96,7 +96,7 @@ public class MatchInfo {
         if(!isValid)
             return 0;
 
-        return _matches.Count % pivot.minMatch + 1;
+        return _matches.Count;
     }
 
     // Join Crossed Matches from same type

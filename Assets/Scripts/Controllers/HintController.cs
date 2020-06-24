@@ -107,7 +107,7 @@ public class HintController : SingletonMonoBehaviour<HintController> {
     public static void StartHinting() {
         if(instance.hinting != null)
             instance.StopCoroutine(instance.hinting);
-            
+
         instance.hinting = instance.StartCoroutine(instance.IEStartHinting());
     }
 
@@ -115,6 +115,8 @@ public class HintController : SingletonMonoBehaviour<HintController> {
         StopCurrentHint();
         if(instance.hinting != null)
             instance.StopCoroutine(instance.hinting);
+        
+        instance.hinting = null;
     }
 
     IEnumerator IEStartHinting() {
