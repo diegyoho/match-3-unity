@@ -74,6 +74,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
         UIController.ShowMainScreen();
         
+        SoundController.PlayMusic("bgm", 1);
     }
 
     void Update() {

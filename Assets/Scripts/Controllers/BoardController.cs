@@ -382,6 +382,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
             GameController.score += matchInfo.GetScore();
         }
+        SoundController.PlaySfx("match");
         yield return new WaitForSeconds(maxDuration/2);
     }
 

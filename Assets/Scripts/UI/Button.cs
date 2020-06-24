@@ -10,6 +10,8 @@ public class Button : MonoBehaviour {
         buttonName.rectTransform.offsetMin = new Vector2(
             buttonName.rectTransform.offsetMin.x, -20
         );
+        
+        SoundController.PlaySfx("click");
     }
 
     public void Released() {
