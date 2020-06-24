@@ -20,6 +20,12 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     TextMeshProUGUI scoreText;
 
     [SerializeField]
+    TextMeshProUGUI comboScoreText;
+
+    [SerializeField]
+    TextMeshProUGUI comboMultiplierText;
+
+    [SerializeField]
     TextMeshProUGUI goalScoreText;
     [SerializeField]
     TextMeshProUGUI timeLeftText;
@@ -52,6 +58,12 @@ public class UIController : SingletonMonoBehaviour<UIController> {
     public static void UpdateScore(int score) {
         instance.scoreText.text = $"{ score }";
         instance.scoreText.transform.parent.GetComponent<Animator>().SetTrigger("pulse");
+    }
+
+    public static void UpdateComboScore(int comboScore, int multiplier) {
+        instance.comboScoreText.text = $"+{ comboScore }";
+        instance.comboMultiplierText.text = (multiplier > 1 ? $" x{ multiplier }" : "");
+        instance.comboScoreText.GetComponent<Animator>().SetTrigger("pulse");
     }
 
     

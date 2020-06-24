@@ -21,11 +21,6 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
 
     [Header("Game Settings")]
-    [SerializeField]
-    GameData _gameData;
-    public static GameData gameData {
-        get { return instance._gameData; }
-    }
     public float swapSpeed;
     public float fallSpeed;
     public bool preventInitialMatches;
@@ -37,6 +32,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     public static int score {
         get { return instance._score; }
         set {
+            UIController.UpdateComboScore(value - instance._score, BoardController.matchCounter);
             instance._score = value;
             UIController.UpdateScore(instance._score);
 
@@ -163,7 +159,6 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     IEnumerator IEChangeGem() {
         gemMenu.gameObject.SetActive(true);
         gem.SetType(GameData.RandomGem());
-        SoundController.PlaySfx(GameData.GetAudioClip("match"));
         instance.gem.animator.SetTrigger("creating");
         yield return new WaitForSeconds(3);
 

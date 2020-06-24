@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: combo-score-ui
+  m_Controller: {fileID: 9100000, guid: e8617bf6c3d7539499608277b64d3c6f, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 872e952749447d542835393591a0ad2f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: c3914372c48e25b4ea006881ee229f6d, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 89f82f15d2bcdee458bf59d91c313c69, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f0c6c8dd32e343b48a49f4909b7f4c6d, type: 2}

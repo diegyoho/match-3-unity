@@ -23,6 +23,13 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     public static GemBase[, ] gemBoard;
+    int _matchCounter;
+    public static int matchCounter {
+        get { return instance._matchCounter; }
+        set {
+            instance._matchCounter = Mathf.Min(value, GameData.maxCombo);
+        }
+    }
 
     [Header("Gem Base Prefab")]
     public GameObject gemPrefab;
@@ -177,6 +184,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             UpdateBoard();
         } else {
             HintController.StartHinting();
+            matchCounter = 0;
             TouchController.cancel = false;
         }
     }
@@ -382,10 +390,10 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                 if(duration > maxDuration)
                     maxDuration = duration;
             }
-
-            GameController.score += matchInfo.GetScore();
+            matchCounter++;
+            GameController.score += matchInfo.GetScore() * matchCounter;
         }
-        UIController.ShowMsg("Match!!!");
+        UIController.ShowMsg($"{ GameData.GetComboMessage(matchCounter - 1) }");
         SoundController.PlaySfx(GameData.GetAudioClip("match"));
         yield return new WaitForSeconds(maxDuration/2);
     }

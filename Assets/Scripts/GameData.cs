@@ -28,8 +28,16 @@ public class AudioClipInfo {
 
 [CreateAssetMenu(fileName = "GameData", menuName = "Match3/GameData", order = 1)]
 public class GameData : SingletonScriptableObject<GameData> {
-    public List<GemData> gems = new List<GemData>();
-    public List<AudioClipInfo> audioClipInfos = new List<AudioClipInfo>();
+    
+    [SerializeField]
+    List<GemData> gems = new List<GemData>();    
+    [SerializeField]
+    List<AudioClipInfo> audioClipInfos = new List<AudioClipInfo>();    
+    [SerializeField]
+    string[] comboMessages;
+    public static int maxCombo {
+        get { return instance.comboMessages.Length; }
+    }
 
     public static GemData RandomGem() {
         return Miscellaneous.Choose(instance.gems);
@@ -42,5 +50,9 @@ public class GameData : SingletonScriptableObject<GameData> {
             return audioClipInfo.clip;
 
         return null;
+    }
+
+    public static string GetComboMessage(int combo) {
+        return instance.comboMessages[combo];
     }
 }
