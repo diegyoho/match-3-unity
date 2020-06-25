@@ -13,7 +13,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 	void Update() {
         if (cancel) return;
 
-    #if UNITY_EDITOR
+    #if UNITY_EDITOR || UNITY_WEBGL
 
 		HandleInputEditor();
 
@@ -58,7 +58,7 @@ public class TouchController : SingletonMonoBehaviour<TouchController> {
 		}
 	}
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_WEBGL
 	Vector3 lastPosition;
 	void HandleInputEditor() {
 		lastPosition = touchPosition;

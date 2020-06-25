@@ -1,0 +1,91 @@
+:root {
+    --primary-text-color: #4cff2c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+html, body {
+    min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100);
+}
+
+body {
+    background-color: black;
+
+    font-family: 'Fira Code', monospace;
+    font-size: 1.6rem;
+    color: var(--primary-text-color);
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+body > * {
+    margin-top: auto;
+}
+
+#unityContainer {
+    position: relative;
+}
+
+#unityContainer canvas {
+    display: block;
+    border: 2px solid var(--primary-text-color);
+}
+
+#load {
+    position: absolute;
+    font-size: 2em;
+}
+
+/* === FOOTER === */
+
+footer {
+    padding: 1.6rem 0;
+
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+footer #social {
+    margin: 0 auto;
+    margin-top: 1.6rem;
+    display: flex;
+    justify-content: center;
+}
+
+footer #social a + a {
+    margin-left: 3.2rem;
+}
+
+footer #social svg {
+    width: 1.6rem;
+
+    fill: var(--primary-text-color);
+    opacity: 0.5;
+
+    transition: opacity 200ms;
+}
+
+footer #social svg:hover {
+    opacity: 1;
+}
+
+@media (max-width: 340px) {
+    html {
+        font-size: 55%;
+    }
+}
