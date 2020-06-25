@@ -4,10 +4,10 @@ using UnityEngine;
 
 [System.Flags]
 public enum MatchType {
-    Invalid,
-    Horizontal,
-    Vertical,
-    Cross
+    Invalid,    //00000000
+    Horizontal, //00000001
+    Vertical,   //00000010
+    Cross       //00000011
 }
 
 public class MatchInfo {
@@ -48,10 +48,6 @@ public class MatchInfo {
             _pivot = matches[0].position;
             AddMatches(matches);
         }
-    }
-
-    public bool TypeIs(MatchType type) {
-        return (this.type & type) != MatchType.Invalid;
     }
 
     void AddMatches(List<GemBase> matches) {

@@ -50,7 +50,6 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         float maxDuration = 0;
         float delayLine = 0;
         for(int j = height - 1; j >= 0; --j) {
-            Debug.Log($"({j}) = {delayLine}");
             for(int i = 0; i < width; ++i) {
                 GemBase gem = instance.CreateRandomGem(
                     i, j, GetWorldPosition(new Vector2Int(i, j + 1)),
@@ -444,13 +443,33 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         int score = 0;
         
         foreach(MatchInfo matchInfo in matches) {
+                
             float duration = DestroyGems(matchInfo.matches, matchInfo.pivot);
             
+            if(matchInfo.type == MatchType.Cross) {
+                float newGemDuration;
+                GemBase newGem = CreateRandomGem(
+                    matchInfo.pivot.position.x,
+                    matchInfo.pivot.position.y,
+                    GetWorldPosition(matchInfo.pivot.position + Vector2Int.up),
+                    0, out newGemDuration
+                );
+
+                newGem.MoveTo(
+                    GetWorldPosition(newGem.position),
+                    GameController.instance.fallSpeed
+                );
+
+                duration += newGemDuration;
+                Debug.Log($"Created { newGem.type } at { newGem.position }");
+            }
+                
             if(duration > maxDuration)
                 maxDuration = duration;
 
             matchCounter++;
             score += matchInfo.GetScore();
+
         }
 
         GameController.score += score * matchCounter;
