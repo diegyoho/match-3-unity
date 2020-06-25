@@ -4,7 +4,7 @@ using UnityEngine;
 using Utilities;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class GemBase : MonoBehaviour, ITouchable {
+public class BaseGem : MonoBehaviour, ITouchable {
 
     Coroutine moveToCoroutine = null;
     Coroutine animationCoroutine = null;
@@ -16,7 +16,11 @@ public class GemBase : MonoBehaviour, ITouchable {
 
     public GemType type;
     public Vector2Int position;
-    public int minMatch = 3;
+    int _minMatch = 3;
+    public virtual int minMatch {
+        get { return _minMatch; }
+        set { _minMatch = value; }
+    }
     
     void Awake() {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -103,7 +107,7 @@ public class GemBase : MonoBehaviour, ITouchable {
             Vector2 delta = TouchController.touchPosition -
                             transform.position;
 
-            GemBase otherGem;
+            BaseGem otherGem;
 
             if(Mathf.Abs(delta.x) > Mathf.Abs(delta.y)) {
 

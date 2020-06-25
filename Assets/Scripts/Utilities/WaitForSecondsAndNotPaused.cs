@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace Utilities {
     public class WaitForSecondsAndNotPaused : CustomYieldInstruction {
         
         float seconds;
-        System.Func<bool> isPaused;
+        Func<bool> isPaused;
         float initialTime;
         
         bool paused {
@@ -31,7 +32,7 @@ namespace Utilities {
         }
 
         public WaitForSecondsAndNotPaused(
-            float seconds, System.Func<bool> isPaused
+            float seconds, Func<bool> isPaused
         ) {
            this.seconds = seconds;
            this.isPaused = isPaused;

@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 1562173510238005296}
   - component: {fileID: 4571077119328886446}
   - component: {fileID: 2100746632092338692}
-  - component: {fileID: 5978925978501162727}
+  - component: {fileID: 8864377848082428839}
   m_Layer: 0
-  m_Name: Gem
+  m_Name: blenderPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 79b18e11270d6f74eabc9f276fc246b1, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -141,7 +141,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &5978925978501162727
+--- !u!114 &8864377848082428839
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -150,11 +150,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6539906006310958499}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 161114b61471d064f824963367cfef65, type: 3}
+  m_Script: {fileID: 11500000, guid: f1aa9e80b27ef2d4ea995fe6f5d138c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
-  type: 0
+  type: 7
   position: {x: 0, y: 0}
-  minMatch: 3

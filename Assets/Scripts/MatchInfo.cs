@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,13 +29,13 @@ public class MatchInfo {
         get { return type != MatchType.Invalid; }
     }
 
-    List<GemBase> _matches = new List<GemBase>();
-    public List<GemBase> matches {
-        get { return new List<GemBase>(_matches); }
+    List<BaseGem> _matches = new List<BaseGem>();
+    public List<BaseGem> matches {
+        get { return new List<BaseGem>(_matches); }
     }
 
     Vector2Int _pivot;
-    public GemBase pivot {
+    public BaseGem pivot {
         get {
             if(type == MatchType.Cross)
                 return _matches.Find(gem => gem.position == _pivot);
@@ -43,14 +44,14 @@ public class MatchInfo {
         }
     }
 
-    public MatchInfo(List<GemBase> matches = null) {
+    public MatchInfo(List<BaseGem> matches = null) {
         if(matches != null) {
             _pivot = matches[0].position;
             AddMatches(matches);
         }
     }
 
-    void AddMatches(List<GemBase> matches) {
+    void AddMatches(List<BaseGem> matches) {
         _matches.AddRange(matches);
         ValidateMatch();
     }
@@ -59,7 +60,7 @@ public class MatchInfo {
         type = MatchType.Invalid;
         minPosition = maxPosition = pivot.position;
 
-        foreach(GemBase match in _matches) {
+        foreach(BaseGem match in _matches) {
             int x = minPosition.x;
             int y = minPosition.y;
 
@@ -96,13 +97,18 @@ public class MatchInfo {
     }
 
     // Join Crossed Matches from same type
-    public static MatchInfo JoinCrossedMatches(MatchInfo a, MatchInfo b) {
+    public static MatchInfo JoinCrossedMatches(
+        MatchInfo a, MatchInfo b, Func<BaseGem, bool> validateGem = null
+    ) {
+        if(validateGem == null) {
+            validateGem = gem => gem.type == b.pivot.type;
+        }
 
-        if(!(a.isValid && b.isValid) || a.pivot.type != b.pivot.type) {
+        if(!(a.isValid && b.isValid) || !validateGem(a.pivot)) {
             return new MatchInfo();
         }
 
-        foreach(GemBase match in a._matches) {
+        foreach(BaseGem match in a._matches) {
             if(b._matches.Contains(match)) {
                 a._pivot = match.position;
                 b._matches.Remove(match);

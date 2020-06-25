@@ -11,13 +11,14 @@ public enum GameState {
 public class GameController : SingletonMonoBehaviour<GameController> {
 
     Coroutine changeGem;
+    Coroutine gameOver;
 
     [Header("Camera Settings")]
     public float cameraWidth = 7;
     public bool autoCameraWidth;
     public GameObject bg;
     public GameObject gemMenu;
-    GemBase gem;
+    BaseGem gem;
 
 
     [Header("Game Settings")]
@@ -88,7 +89,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         );
 
         gemMenu.transform.localScale = Vector3.one * 2 * (cameraWidth / 7f);
-        gem = gemMenu.GetComponentInChildren<GemBase>();
+        gem = gemMenu.GetComponentInChildren<BaseGem>();
 
         UIController.ShowMainScreen();
         
@@ -140,15 +141,18 @@ public class GameController : SingletonMonoBehaviour<GameController> {
     }
 
     void GameOver() {
-        StartCoroutine(IEGameOver());
+        if(gameOver == null)
+            gameOver = StartCoroutine(IEGameOver());
     }
 
     IEnumerator IEGameOver() {
 
         yield return new WaitUntil(() => !BoardController.updatingBoard);
 
-        if(timeLeft > 0)
+        if(timeLeft > 0) {
+            gameOver = null;
             yield break;
+        }
 
         TouchController.cancel = true;
         state = GameState.Menu;
@@ -157,6 +161,7 @@ public class GameController : SingletonMonoBehaviour<GameController> {
         UIController.ShowMsg("Game Over");
         yield return new WaitForSeconds(BoardController.DestroyGems() + .5f);
         UIController.ShowMainScreen();
+        gameOver = null;
     }
 
     public static void ShowGemMenu(bool show = true) {

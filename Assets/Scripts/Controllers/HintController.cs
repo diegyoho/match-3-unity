@@ -5,11 +5,11 @@ using Utilities;
 
 [System.Serializable]
 public class HintInfo {
-    public GemBase gem;
-    public GemBase currentSwap;
-    public List<GemBase> swaps = new List<GemBase>();
+    public BaseGem gem;
+    public BaseGem currentSwap;
+    public List<BaseGem> swaps = new List<BaseGem>();
 
-    public HintInfo(GemBase gem) {
+    public HintInfo(BaseGem gem) {
         this.gem = gem;
     }
 }
@@ -32,7 +32,7 @@ public class HintController : SingletonMonoBehaviour<HintController> {
 
     public static bool paused;
     
-    HintInfo GetHint(GemBase gem, GemBase otherGem) {
+    HintInfo GetHint(BaseGem gem, BaseGem otherGem) {
         if(!(gem && otherGem))
             return null;
 
@@ -64,10 +64,10 @@ public class HintController : SingletonMonoBehaviour<HintController> {
 
         for(int j = 0; j < BoardController.height; ++j) {
             for(int i = 0; i < BoardController.width; ++i) {
-                GemBase gem = BoardController.GetGem(i, j);
+                BaseGem gem = BoardController.GetGem(i, j);
                 
                 // Swap Right
-                GemBase otherGem = BoardController.GetGem(i + 1, j);
+                BaseGem otherGem = BoardController.GetGem(i + 1, j);
                 if(otherGem && otherGem.type != gem.type) {
                     HintInfo hintInfo = instance.GetHint(gem, otherGem);
 

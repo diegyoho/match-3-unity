@@ -34,6 +34,10 @@ MonoBehaviour:
   - type: 6
     sprite: {fileID: 21300000, guid: b165480f1284456469c068e6cb5fc650, type: 3}
     minMatch: 3
+  specialGems:
+  - name: Blender
+    prefab: {fileID: 6539906006310958499, guid: e61eea144c3cdb646a313258d3e2629f,
+      type: 3}
   audioClipInfos:
   - name: bgm
     clip: {fileID: 8300000, guid: f54f914e1258c5f4e90a9226d10af526, type: 3}

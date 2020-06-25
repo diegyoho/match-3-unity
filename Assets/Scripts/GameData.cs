@@ -10,7 +10,8 @@ public enum GemType {
     Bread,
     Lettuce,
     Coconut,
-    Flower
+    Flower,
+    Special
 }
 
 [System.Serializable]
@@ -18,6 +19,12 @@ public class GemData {
     public GemType type;
     public Sprite sprite;
     public int minMatch = 3;
+}
+
+[System.Serializable]
+public class SpecialGemData {
+    public string name;
+    public GameObject prefab;
 }
 
 [System.Serializable]
@@ -30,9 +37,11 @@ public class AudioClipInfo {
 public class GameData : SingletonScriptableObject<GameData> {
     
     [SerializeField]
-    List<GemData> gems = new List<GemData>();    
+    List<GemData> gems = new List<GemData>();
     [SerializeField]
-    List<AudioClipInfo> audioClipInfos = new List<AudioClipInfo>();    
+    List<SpecialGemData> specialGems = new List<SpecialGemData>();
+    [SerializeField]
+    List<AudioClipInfo> audioClipInfos = new List<AudioClipInfo>();
     [SerializeField]
     string[] comboMessages;
     public static int maxCombo {
@@ -45,6 +54,14 @@ public class GameData : SingletonScriptableObject<GameData> {
 
     public static GemData RandomGem() {
         return Miscellaneous.Choose(instance.gems);
+    }
+
+    public static GameObject GetSpecialGem(string name) {
+        SpecialGemData sgd = instance.specialGems.Find(gem => gem.name == name);
+        if(sgd != null)
+            return sgd.prefab;
+
+        return null;
     }
 
     public static AudioClip GetAudioClip(string name) {
