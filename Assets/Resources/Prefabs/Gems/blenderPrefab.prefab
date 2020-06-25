@@ -132,7 +132,7 @@ Animator:
   m_GameObject: {fileID: 6539906006310958499}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 954b782890db15840975fee254c4f6f2, type: 2}
+  m_Controller: {fileID: 22100000, guid: 333db7bc857253b41997cb3bc05ecaa3, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -155,5 +155,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
-  type: 7
   position: {x: 0, y: 0}
+  _type: 0
+  _minMatch: 3
+  activated: 0

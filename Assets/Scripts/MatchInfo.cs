@@ -34,6 +34,8 @@ public class MatchInfo {
         get { return new List<BaseGem>(_matches); }
     }
 
+    public List<MatchInfo> specialMatches = new List<MatchInfo>();
+
     Vector2Int _pivot;
     public BaseGem pivot {
         get {
@@ -54,6 +56,10 @@ public class MatchInfo {
     void AddMatches(List<BaseGem> matches) {
         _matches.AddRange(matches);
         ValidateMatch();
+    }
+
+    public void RemoveMatches(List<BaseGem> matches) {
+        _matches.RemoveAll(g => matches.Contains(g));
     }
 
     void ValidateMatch() {
@@ -97,14 +103,9 @@ public class MatchInfo {
     }
 
     // Join Crossed Matches from same type
-    public static MatchInfo JoinCrossedMatches(
-        MatchInfo a, MatchInfo b, Func<BaseGem, bool> validateGem = null
-    ) {
-        if(validateGem == null) {
-            validateGem = gem => gem.type == b.pivot.type;
-        }
-
-        if(!(a.isValid && b.isValid) || !validateGem(a.pivot)) {
+    public static MatchInfo JoinCrossedMatches(MatchInfo a, MatchInfo b) {
+        
+        if(!(a.isValid && b.isValid) || a.pivot.type != b.pivot.type) {
             return new MatchInfo();
         }
 

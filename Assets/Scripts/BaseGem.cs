@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utilities;
@@ -14,12 +15,30 @@ public class BaseGem : MonoBehaviour, ITouchable {
     [HideInInspector]
     public Animator animator;
 
-    public GemType type;
     public Vector2Int position;
+
+    [SerializeField]
+    GemType _type;
+    public virtual GemType type {
+        get { return _type; }
+        set { _type = value; }
+    }
+    
+    [SerializeField]
     int _minMatch = 3;
     public virtual int minMatch {
         get { return _minMatch; }
         set { _minMatch = value; }
+    }
+
+    public virtual Func<BaseGem, bool> validateGem {
+        get {
+            return gem => gem.type == type;
+        }
+    }
+
+    public virtual MatchInfo GetMatch() {
+        return BoardController.GetCrossMatch(this, validateGem);
     }
     
     void Awake() {

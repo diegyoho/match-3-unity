@@ -155,6 +155,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
-  type: 0
   position: {x: 0, y: 0}
-  minMatch: 3
+  _type: 0
+  _minMatch: 3

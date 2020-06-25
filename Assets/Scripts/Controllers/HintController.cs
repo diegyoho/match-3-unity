@@ -43,8 +43,8 @@ public class HintController : SingletonMonoBehaviour<HintController> {
 
         BoardController.SwapGems(gem, otherGem);
 
-        MatchInfo matchA = BoardController.GetCrossMatch(gem);
-        MatchInfo matchB = BoardController.GetCrossMatch(otherGem);
+        MatchInfo matchA = gem.GetMatch();
+        MatchInfo matchB = otherGem.GetMatch();
 
         if(matchA.isValid) {
             hintInfo = hintA != null ? hintA : new HintInfo(gem);
@@ -65,7 +65,7 @@ public class HintController : SingletonMonoBehaviour<HintController> {
         for(int j = 0; j < BoardController.height; ++j) {
             for(int i = 0; i < BoardController.width; ++i) {
                 BaseGem gem = BoardController.GetGem(i, j);
-                
+
                 // Swap Right
                 BaseGem otherGem = BoardController.GetGem(i + 1, j);
                 if(otherGem && otherGem.type != gem.type) {

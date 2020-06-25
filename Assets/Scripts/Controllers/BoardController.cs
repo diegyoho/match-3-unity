@@ -5,7 +5,7 @@ using UnityEngine;
 using Utilities;
 
 public class BoardController : SingletonMonoBehaviour<BoardController> {
-
+    
     Coroutine updateBoard = null;
     
     [Header("Board Dimensions")]
@@ -33,7 +33,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     public static bool updatingBoard;
-
+    public static event Action EndUpdatingBoard;
     // Calculate Board Position into World
     public static Vector3 GetWorldPosition(Vector2Int position) {
         return new Vector2(
@@ -57,11 +57,11 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                     delayLine
                 );
 
-
-                if(GameController.instance.preventInitialMatches)
-                    while(GetCrossMatch(gem).isValid) {
+                if(GameController.instance.preventInitialMatches) {
+                    while(gem.GetMatch().isValid) {
                         gem.SetType(GameData.RandomGem());
                     }
+                }
 
                 float duration = gem.MoveTo(
                     GetWorldPosition(gem.position),
@@ -178,20 +178,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
         EnableUpdateBoard(true);
         yield return StartCoroutine(IESwapGems(from, to));
         
-        MatchInfo matchFrom;
-        MatchInfo matchTo;
-
-        if(from is SpecialGem) {
-            matchFrom = GetCrossMatch(from, (from as SpecialGem).validateGem);
-        } else {
-            matchFrom = GetCrossMatch(from);
-        }
-
-        if(to is SpecialGem) {
-            matchTo = GetCrossMatch(to, (to as SpecialGem).validateGem);
-        } else {
-            matchTo = GetCrossMatch(to);
-        }
+        MatchInfo matchFrom = from.GetMatch();
+        MatchInfo matchTo = to.GetMatch();
 
         if(!(matchFrom.isValid || matchTo.isValid)) {
             yield return StartCoroutine(IESwapGems(from, to));
@@ -202,20 +190,45 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
 
             List<MatchInfo> matches = new List<MatchInfo>();
             List<Vector2Int> fallPositions = new List<Vector2Int>();
+
+            matches.Add(matchFrom);
+            matches.Add(matchTo);
             
-            if(matchFrom.isValid) {
-                matches.Add(matchFrom);
-                fallPositions = MatchInfo.JoinFallPositions(
-                    fallPositions, matchFrom.GetFallPositions()
-                );
+            if(from.type == GemType.Special) {
+                foreach(MatchInfo specialMatch in matchFrom.specialMatches) {
+                    matches.Add(specialMatch);
+                }
             }
 
-            if(matchTo.isValid) {
-                matches.Add(matchTo);
-                fallPositions = MatchInfo.JoinFallPositions(
-                    fallPositions, matchTo.GetFallPositions()
-                );
+            if(to.type == GemType.Special) {
+                foreach(MatchInfo specialMatch in matchTo.specialMatches) {
+                    matches.Add(specialMatch);
+                }
             }
+
+            foreach(var matchInfo in new List<MatchInfo>(matches)) {
+                if(matchInfo.isValid) {
+                    fallPositions = MatchInfo.JoinFallPositions(
+                        fallPositions, matchInfo.GetFallPositions()
+                    );
+                } else {
+                    matches.Remove(matchInfo);
+                }
+            }
+
+            // if(matchFrom.isValid) {
+            //     matches.Add(matchFrom);
+            //     fallPositions = MatchInfo.JoinFallPositions(
+            //         fallPositions, matchFrom.GetFallPositions()
+            //     );
+            // }
+
+            // if(matchTo.isValid) {
+            //     matches.Add(matchTo);
+            //     fallPositions = MatchInfo.JoinFallPositions(
+            //         fallPositions, matchTo.GetFallPositions()
+            //     );
+            // }
             
             yield return StartCoroutine(DestroyMatchedGems(matches));
             yield return StartCoroutine(FallGems(fallPositions));
@@ -249,6 +262,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             EnableUpdateBoard(false);
             matchCounter = 0;
             HintController.StartHinting();
+            if(EndUpdatingBoard != null)
+                EndUpdatingBoard();
         }
     }
 
@@ -267,10 +282,11 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
             BaseGem current = gems[0];
             gems.Remove(current);
 
-            if(current is SpecialGem)
+            if(current.type == GemType.Special) {
                 continue;
+            }
             
-            MatchInfo matchInfo = GetCrossMatch(current);
+            MatchInfo matchInfo = current.GetMatch();
             if(matchInfo.isValid) {
                 matchInfo.matches.ForEach( gem => gems.Remove(gem));
                 
@@ -355,11 +371,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
     
     public static MatchInfo GetHorizontalMatch(
-        BaseGem gem, Func<BaseGem, bool> validateGem = null
+        BaseGem gem, Func<BaseGem, bool> validateGem
     ) {
-        if(validateGem == null) {
-            validateGem = otherGem => otherGem.type == gem.type;
-        }
 
         List<BaseGem> matches = new List<BaseGem>();
         
@@ -383,11 +396,8 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     public static MatchInfo GetVerticalMatch(
-        BaseGem gem, Func<BaseGem, bool> validateGem = null
+        BaseGem gem, Func<BaseGem, bool> validateGem
     ) {
-        if(validateGem == null) {
-            validateGem = otherGem => otherGem.type == gem.type;
-        }
         
         List<BaseGem> matches = new List<BaseGem>();
         
@@ -411,7 +421,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
     }
 
     public static MatchInfo GetCrossMatch(
-        BaseGem gem, Func<BaseGem, bool> validateGem = null
+        BaseGem gem, Func<BaseGem, bool> validateGem
     ) {
         
         List<BaseGem> matches = new List<BaseGem>();
@@ -490,7 +500,7 @@ public class BoardController : SingletonMonoBehaviour<BoardController> {
                 BaseGem newGem = CreateGem(
                     matchInfo.pivot.position.x,
                     matchInfo.pivot.position.y,
-                    GameData.GemOfType(GemType.Milk),
+                    GameData.GemOfType(GemType.Special),
                     GetWorldPosition(matchInfo.pivot.position + Vector2Int.up),
                     0, out newGemDuration, GameData.GetSpecialGem("Blender")
                 );
