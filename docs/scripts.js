@@ -26,7 +26,7 @@ function resizeCanvas() {
         screen.style.height = `${ minDimensionScreen }px`
     } else {
         screen.style.width = `${ minDimensionScreen }px`
-        screen.style.height = `${ window.innerHeight * .875 }px`
+        screen.style.height = `${ window.innerHeight }px`
     }
 
     document.documentElement.style.setProperty('--map-width', `${minDimensionScreen * 0.01}px`)

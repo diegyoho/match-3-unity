@@ -8,7 +8,7 @@
         <script src="Build/UnityLoader.js"></script>
         <script>
             function clickToLoad() {
-                UnityLoader.instantiate("unityContainer", "Build/public.json");
+                UnityLoader.instantiate("unityContainer", "Build/docs.json");
                 document.querySelector('#load').remove();
                 window.removeEventListener('click', clickToLoad);
             }
