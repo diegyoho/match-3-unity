@@ -3,12 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>Unity WebGL Player | %UNITY_WEB_NAME%</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Unity WebGL Player | Match 3</title>
         <link rel="stylesheet" href="./style.css">
-        <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+        <script src="Build/UnityLoader.js"></script>
         <script>
             function clickToLoad() {
-                UnityLoader.instantiate("unityContainer", "%UNITY_WEBGL_BUILD_URL%");
+                UnityLoader.instantiate("unityContainer", "Build/docs.json");
                 document.querySelector('#load').remove();
                 window.removeEventListener('click', clickToLoad);
             }
@@ -17,7 +18,7 @@
         </script>
     </head>
     <body>
-        <div id="unityContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px; margin: auto"></div>
+        <div id="unityContainer" style="width: 720px; height: 1280px; margin: auto"></div>
         <div id="load">
             Click to Load!
         </div>

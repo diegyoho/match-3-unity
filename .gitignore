@@ -70,5 +70,8 @@ crashlytics-build.properties
 InitTestScene*.unity.meta
 InitTestScene*.unity
 
+# TextMesh Pro files
+[Aa]ssets/TextMesh*Pro/
+TextMesh*Pro.meta
 
 # End of https://www.toptal.com/developers/gitignore/api/unity

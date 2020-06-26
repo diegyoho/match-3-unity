@@ -80,12 +80,17 @@ public class GameController : SingletonMonoBehaviour<GameController> {
 
     void Start() {
         if(autoCameraWidth)
-            cameraWidth = BoardController.width + 1;
+            cameraWidth = BoardController.width + (Camera.main.aspect * 2);
         
         Miscellaneous.SetCameraOrthographicSizeByWidth(Camera.main, cameraWidth);
+        float bgWidth = bg.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         float bgHeight = bg.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
+
         bg.transform.localScale = Vector3.one * (
-            Camera.main.orthographicSize * 2 / bgHeight
+            Mathf.Max(
+                cameraWidth / bgWidth,
+                Camera.main.orthographicSize * 2 / bgHeight
+            )
         );
 
         gemMenu.transform.localScale = Vector3.one * 2 * (cameraWidth / 7f);
